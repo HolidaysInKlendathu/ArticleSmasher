@@ -1,0 +1,60 @@
+<svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background -->
+    <rect width="800" height="400" fill="#f8f9fa"/>
+    
+    <!-- Google Sheets -->
+    <rect x="50" y="50" width="120" height="80" rx="10" fill="#34A853" opacity="0.9"/>
+    <text x="110" y="95" font-family="Arial" font-size="14" fill="white" text-anchor="middle">Google Sheets</text>
+    <text x="110" y="115" font-family="Arial" font-size="12" fill="white" text-anchor="middle">Source URLs</text>
+
+    <!-- Web Scraping -->
+    <rect x="250" y="50" width="120" height="80" rx="10" fill="#4285F4" opacity="0.9"/>
+    <text x="310" y="95" font-family="Arial" font-size="14" fill="white" text-anchor="middle">Web Scraping</text>
+    <text x="310" y="115" font-family="Arial" font-size="12" fill="white" text-anchor="middle">Content Extraction</text>
+
+    <!-- Claude AI -->
+    <rect x="450" y="50" width="120" height="80" rx="10" fill="#673AB7" opacity="0.9"/>
+    <text x="510" y="95" font-family="Arial" font-size="14" fill="white" text-anchor="middle">Claude AI</text>
+    <text x="510" y="115" font-family="Arial" font-size="12" fill="white" text-anchor="middle">Content Generation</text>
+
+    <!-- Category Detection -->
+    <rect x="650" y="50" width="120" height="80" rx="10" fill="#FF5722" opacity="0.9"/>
+    <text x="710" y="95" font-family="Arial" font-size="14" fill="white" text-anchor="middle">Category</text>
+    <text x="710" y="115" font-family="Arial" font-size="12" fill="white" text-anchor="middle">Detection</text>
+
+    <!-- MinIO Storage -->
+    <rect x="250" y="250" width="120" height="80" rx="10" fill="#FFC107" opacity="0.9"/>
+    <text x="310" y="295" font-family="Arial" font-size="14" fill="white" text-anchor="middle">MinIO Storage</text>
+    <text x="310" y="315" font-family="Arial" font-size="12" fill="white" text-anchor="middle">Markdown Files</text>
+
+    <!-- Database -->
+    <rect x="450" y="250" width="120" height="80" rx="10" fill="#2196F3" opacity="0.9"/>
+    <text x="510" y="295" font-family="Arial" font-size="14" fill="white" text-anchor="middle">MySQL DB</text>
+    <text x="510" y="315" font-family="Arial" font-size="12" fill="white" text-anchor="middle">Article Metadata</text>
+
+    <!-- Connecting Arrows -->
+    <!-- Google Sheets to Web Scraping -->
+    <path d="M170 90 L250 90" stroke="#666" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+    
+    <!-- Web Scraping to Claude -->
+    <path d="M370 90 L450 90" stroke="#666" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+    
+    <!-- Claude to Category Detection -->
+    <path d="M570 90 L650 90" stroke="#666" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+    
+    <!-- Category Detection to Storage -->
+    <path d="M710 130 L710 170 L310 170 L310 250" stroke="#666" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+    
+    <!-- Category Detection to Database -->
+    <path d="M710 130 L710 170 L510 170 L510 250" stroke="#666" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+
+    <!-- Arrowhead marker -->
+    <defs>
+        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#666"/>
+        </marker>
+    </defs>
+
+    <!-- Project Title -->
+    <text x="400" y="375" font-family="Arial" font-size="16" font-weight="bold" fill="#333" text-anchor="middle">ArticleSmasher: Content Generation Pipeline</text>
+</svg>

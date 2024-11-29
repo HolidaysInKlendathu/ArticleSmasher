@@ -2,6 +2,8 @@
 
 ArticleSmasher is an automated content generation and management system that processes multiple news sources to create well-structured, SEO-optimized articles. The system integrates with Google Sheets for source management, uses Claude AI for content generation, and handles storage through MinIO and a MySQL database.
 
+![ArticleSmasher Project Flow](project-diagram.svg)
+
 ## Features
 
 - **Source Management**: Fetches article sources from Google Sheets
