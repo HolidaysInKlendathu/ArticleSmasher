@@ -1,0 +1,269 @@
+{
+    "categories": [
+      {
+        "name": "Industry News",
+        "slug": "industry-news",
+        "description": "Stay informed about the latest regulatory changes, market shifts, trends, ESG initiatives, and ethical practices in the insurance industry.",
+        "keywords": [
+          "regulation", "regulatory", "market", "industry", "trend", "policy",
+          "legislation", "compliance", "reform", "rules", "law", "oversight",
+          "standards", "guidelines", "directive", "mandate", "requirement",
+          "protocol", "framework", "governance", "authority", "commission"
+        ],
+        "subCategories": [
+          {
+            "name": "Regulatory & Legal Changes",
+            "slug": "regulatory-legal-changes",
+            "keywords": [
+              "regulation", "compliance", "law", "legal", "legislation", "reform",
+              "policy", "requirement", "mandate", "directive", "guideline"
+            ]
+          },
+          {
+            "name": "Mergers, Acquisitions & Market Shifts",
+            "slug": "mergers-acquisitions-market-shifts",
+            "keywords": [
+              "merger", "acquisition", "consolidation", "buyout", "takeover",
+              "market shift", "market change", "consolidation", "partnership",
+              "joint venture", "deal", "transaction"
+            ]
+          },
+          {
+            "name": "Trends & Insights",
+            "slug": "trends-insights",
+            "keywords": [
+              "trend", "insight", "analysis", "forecast", "prediction", "outlook",
+              "future", "development", "growth", "decline", "shift", "change",
+              "movement", "direction", "pattern"
+            ]
+          },
+          {
+            "name": "ESG & Green Insurance",
+            "slug": "esg-green-insurance",
+            "keywords": [
+              "ESG", "environmental", "social", "governance", "green", "sustainable",
+              "sustainability", "climate", "renewable", "responsible", "ethical"
+            ]
+          },
+          {
+            "name": "Consumer Protection & Fair Practices",
+            "slug": "consumer-protection-fair-practices",
+            "keywords": [
+              "consumer", "protection", "fair", "practice", "rights", "advocacy",
+              "transparency", "disclosure", "fairness", "equality", "justice"
+            ]
+          },
+          {
+            "name": "Transparency & Ethical Insurance",
+            "slug": "transparency-ethical-insurance",
+            "keywords": [
+              "transparency", "ethical", "moral", "integrity", "honesty", "trust",
+              "accountability", "responsibility", "disclosure", "openness"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Risk & Innovation",
+        "slug": "risk-innovation",
+        "description": "Explore advancements in risk management, insurance technology, and fraud prevention.",
+        "keywords": [
+          "technology", "innovation", "insurtech", "digital", "automation",
+          "AI", "artificial intelligence", "data", "analytics", "machine learning",
+          "blockchain", "cryptocurrency", "digital transformation", "disruption"
+        ],
+        "subCategories": [
+          {
+            "name": "Risk Management & Analytics",
+            "slug": "risk-management-analytics",
+            "keywords": [
+              "risk", "management", "analytics", "assessment", "analysis",
+              "mitigation", "prevention", "modeling", "forecasting", "prediction"
+            ]
+          },
+          {
+            "name": "Insurance Technology (InsurTech)",
+            "slug": "insurance-technology-insurtech",
+            "keywords": [
+              "insurtech", "technology", "digital", "automation", "AI",
+              "artificial intelligence", "machine learning", "innovation"
+            ]
+          },
+          {
+            "name": "Fraud Prevention & Scam Detection",
+            "slug": "fraud-prevention-scam-detection",
+            "keywords": [
+              "fraud", "scam", "prevention", "detection", "security", "protection",
+              "cybersecurity", "threat", "risk", "breach", "vulnerability"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Claims & Policies",
+        "slug": "claims-policies",
+        "description": "Understand the processes behind claims management, underwriting, and insurance regulations.",
+        "keywords": [
+          "claim", "policy", "coverage", "lawsuit", "legal", "liability",
+          "compensation", "settlement", "damages", "injury", "accident",
+          "investigation", "adjuster", "adjustment", "processing"
+        ],
+        "subCategories": [
+          {
+            "name": "Claims Management",
+            "slug": "claims-management",
+            "keywords": [
+              "claim", "management", "processing", "adjustment", "settlement",
+              "investigation", "evaluation", "resolution", "handling"
+            ]
+          },
+          {
+            "name": "Underwriting Processes",
+            "slug": "underwriting-processes",
+            "keywords": [
+              "underwriting", "assessment", "risk", "evaluation", "pricing",
+              "premium", "rating", "approval", "decision", "criteria"
+            ]
+          },
+          {
+            "name": "Insurance Laws & Regulations",
+            "slug": "insurance-laws-regulations",
+            "keywords": [
+              "law", "regulation", "compliance", "legal", "requirement",
+              "statute", "legislation", "policy", "guideline", "rule"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Products & Trends",
+        "slug": "products-trends",
+        "description": "Discover and compare insurance products, explore consumer preferences, and analyze market trends.",
+        "keywords": [
+          "product", "service", "offering", "plan", "package", "premium",
+          "price", "cost", "rate", "customer", "consumer", "market",
+          "trend", "preference", "demand", "need", "requirement"
+        ],
+        "subCategories": [
+          {
+            "name": "Insurance Types (Life, Health, Auto, etc.)",
+            "slug": "insurance-types",
+            "keywords": [
+              "life", "health", "auto", "car", "home", "property", "casualty",
+              "disability", "long-term care", "umbrella", "liability"
+            ]
+          },
+          {
+            "name": "Specialized Insurance Products",
+            "slug": "specialized-insurance-products",
+            "keywords": [
+              "cyber", "pet", "travel", "wedding", "event", "marine",
+              "aviation", "cryptocurrency", "parametric", "microinsurance"
+            ]
+          },
+          {
+            "name": "Product Comparisons & Reviews",
+            "slug": "product-comparisons-reviews",
+            "keywords": [
+              "comparison", "review", "rating", "evaluation", "assessment",
+              "analysis", "recommendation", "guide", "buying", "shopping"
+            ]
+          },
+          {
+            "name": "Customer Experience in Insurance",
+            "slug": "customer-experience-insurance",
+            "keywords": [
+              "experience", "service", "satisfaction", "journey", "interaction",
+              "engagement", "feedback", "response", "support", "assistance"
+            ]
+          },
+          {
+            "name": "Changing Consumer Preferences",
+            "slug": "changing-consumer-preferences",
+            "keywords": [
+              "preference", "behavior", "habit", "choice", "decision",
+              "selection", "trend", "shift", "change", "evolution"
+            ]
+          },
+          {
+            "name": "Behavioral Shifts & Market Trends",
+            "slug": "behavioral-shifts-market-trends",
+            "keywords": [
+              "behavior", "trend", "pattern", "shift", "change", "movement",
+              "direction", "development", "evolution", "transformation"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Geographical",
+        "slug": "geographical-breakdown",
+        "description": "Explore insurance news and trends across different regions in the United States and internationally.",
+        "keywords": [
+          "state", "county", "city", "region", "local", "national",
+          "area", "district", "location", "regional", "territorial",
+          "geographical", "jurisdiction", "zone", "territory"
+        ],
+        "subCategories": [
+          {
+            "name": "East",
+            "slug": "east",
+            "keywords": [
+              "new york", "pennsylvania", "massachusetts", "connecticut",
+              "new jersey", "maine", "vermont", "new hampshire", "rhode island"
+            ]
+          },
+          {
+            "name": "Midwest",
+            "slug": "midwest",
+            "keywords": [
+              "illinois", "indiana", "michigan", "ohio", "wisconsin",
+              "iowa", "kansas", "minnesota", "missouri", "nebraska",
+              "north dakota", "south dakota"
+            ]
+          },
+          {
+            "name": "South Central",
+            "slug": "south-central",
+            "keywords": [
+              "texas", "oklahoma", "arkansas", "louisiana", "mississippi"
+            ]
+          },
+          {
+            "name": "Southeast",
+            "slug": "southeast",
+            "keywords": [
+              "florida", "georgia", "alabama", "south carolina",
+              "north carolina", "tennessee", "kentucky", "virginia",
+              "west virginia"
+            ]
+          },
+          {
+            "name": "West",
+            "slug": "west",
+            "keywords": [
+              "california", "oregon", "washington", "nevada", "arizona",
+              "idaho", "montana", "wyoming", "colorado", "new mexico",
+              "utah", "hawaii", "alaska"
+            ]
+          },
+          {
+            "name": "National",
+            "slug": "national",
+            "keywords": [
+              "national", "federal", "nationwide", "country", "domestic",
+              "united states", "america", "US", "USA", "national level"
+            ]
+          },
+          {
+            "name": "International",
+            "slug": "international",
+            "keywords": [
+              "international", "global", "worldwide", "foreign", "overseas",
+              "multinational", "cross-border", "offshore", "world"
+            ]
+          }
+        ]
+      }
+    ]
+  }
