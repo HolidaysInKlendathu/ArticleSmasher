@@ -155,6 +155,39 @@ class DatabaseHandler:
                             article_data["authorId"]
                         ))
 
+                    # After creating/updating the article, handle categories
+                    if article_data.get("categories"):
+                        # First, ensure categories exist
+                        for category_slug in article_data["categories"]:
+                            # Check if category exists
+                            cursor.execute(
+                                "SELECT id FROM Category WHERE slug = %s",
+                                (category_slug,)
+                            )
+                            category = cursor.fetchone()
+                            
+                            if not category:
+                                # Create category if it doesn't exist
+                                cursor.execute(
+                                    "INSERT INTO Category (name, slug) VALUES (%s, %s)",
+                                    (category_slug.title(), category_slug)
+                                )
+                                cursor.execute(
+                                    "SELECT id FROM Category WHERE slug = %s",
+                                    (category_slug,)
+                                )
+                                category = cursor.fetchone()
+
+                            # Create category-article relationship
+                            cursor.execute("""
+                                INSERT INTO CategoriesOnArticles (articleId, categoryId)
+                                VALUES (%s, %s)
+                                ON DUPLICATE KEY UPDATE categoryId = VALUES(categoryId)
+                            """, (
+                                existing_article[0] if existing_article else new_id,
+                                category[0]
+                            ))
+
                     connection.commit()
                     print(f"Successfully created/updated article with ID: {new_id if not existing_article else existing_article[0]}")
                     return True
@@ -469,7 +502,7 @@ class ContentGenerator:
                 "title": article_data["title"],
                 "slug": article_data["slug"],
                 "excerpt": content_data["excerpt"],
-                "coverImage": "/images/default-cover.jpg",
+                "coverImage": "/images/default.webp",
                 "publishedAt": datetime.now().isoformat(),
                 "author": "cm3pw0m9u00026hqfvtiqmtcw",
                 "status": "PUBLISHED",
@@ -649,7 +682,7 @@ class ArticleProcessor(GoogleSheetsManager):
                 "content": content_data["content"],
                 "markdownUrl": storage_url,
                 "excerpt": content_data["excerpt"],
-                "coverImage": "/images/default-cover.jpg",
+                "coverImage": "/images/default.webp",
                 "readingTime": math.ceil(len(content_data["content"].split()) / 200),
                 "wordCount": len(content_data["content"].split()),
                 "status": "DRAFT",
@@ -668,7 +701,10 @@ class ArticleProcessor(GoogleSheetsManager):
                 "hasAudio": content_data["suggestedFeatures"]["hasAudio"],
                 "hasGallery": content_data["suggestedFeatures"]["hasGallery"],
                 "authorId": "cm3pw0m9u00026hqfvtiqmtcw",
-                "categories": [result["primary_category"]["slug"]],
+                "categories": [
+                    result["primary_category"]["slug"],
+                    *[cat["slug"] for cat in result.get("additional_categories", [])]
+                ],
                 "tags": content_data["tags"]
             }
             

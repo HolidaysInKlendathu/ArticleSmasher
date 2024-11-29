@@ -120,7 +120,7 @@ class ContentGenerator:
                 "title": article_data["title"],
                 "slug": article_data["slug"],
                 "excerpt": content_data.get("excerpt", ""),
-                "coverImage": "/images/default-cover.jpg",
+                "coverImage": "/images/default.webp",
                 "publishedAt": datetime.now().isoformat(),
                 "author": "cm3pw0m9u00026hqfvtiqmtcw",
                 "status": "PUBLISHED",
