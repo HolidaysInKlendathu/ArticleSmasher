@@ -16,6 +16,7 @@ import math
 from minio import Minio
 from datetime import datetime
 import pymysql
+import uuid
 
 
 # Import our GoogleSheetsManager
@@ -168,21 +169,18 @@ class DatabaseHandler:
                             
                             if not category:
                                 # Create category if it doesn't exist
+                                category_id = str(uuid.uuid4())  # Generate a UUID for the category
                                 cursor.execute(
-                                    "INSERT INTO Category (name, slug) VALUES (%s, %s)",
-                                    (category_slug.title(), category_slug)
+                                    "INSERT INTO Category (id, name, slug) VALUES (%s, %s, %s)",
+                                    (category_id, category_slug.title(), category_slug)
                                 )
-                                cursor.execute(
-                                    "SELECT id FROM Category WHERE slug = %s",
-                                    (category_slug,)
-                                )
-                                category = cursor.fetchone()
+                                category = (category_id,)
 
                             # Create category-article relationship
                             cursor.execute("""
-                                INSERT INTO CategoriesOnArticles (articleId, categoryId)
+                                INSERT INTO _ArticleToCategory (A, B)
                                 VALUES (%s, %s)
-                                ON DUPLICATE KEY UPDATE categoryId = VALUES(categoryId)
+                                ON DUPLICATE KEY UPDATE A = VALUES(A)
                             """, (
                                 existing_article[0] if existing_article else new_id,
                                 category[0]
