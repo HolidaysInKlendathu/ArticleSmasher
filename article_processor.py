@@ -22,6 +22,7 @@ from tenacity import retry, stop_after_attempt, wait_exponential
 from PIL import Image
 import io
 import requests
+import re
 
 
 # Import our GoogleSheetsManager
@@ -480,7 +481,28 @@ class ContentGenerator:
             elif "```" in response_text:
                 response_text = response_text.split("```")[1].strip()
             
-            result = json.loads(response_text)
+            # Clean control characters before parsing JSON
+            response_text = re.sub(r'[\x00-\x1F\x7F-\x9F]', '', response_text)
+            
+            try:
+                result = json.loads(response_text)
+            except json.JSONDecodeError as e:
+                print(f"JSON parsing error: {e}")
+                print("Response text:", response_text[:200])  # Print first 200 chars for debugging
+                
+                # Fallback content
+                return {
+                    "content": f"<h1>{title}</h1>\n<p>Content generation failed. Please try again.</p>",
+                    "excerpt": f"Article about {title}",
+                    "metaTitle": title[:70],
+                    "metaDescription": f"Learn about {title}",
+                    "tags": [],
+                    "suggestedFeatures": {
+                        "hasVideo": False,
+                        "hasAudio": False,
+                        "hasGallery": False
+                    }
+                }
             
             # Validate content length
             word_count = len(result["content"].split())
@@ -492,6 +514,7 @@ class ContentGenerator:
             
         except Exception as e:
             print(f"Error generating content: {str(e)}")
+            print("Full error:", str(e.__class__.__name__), str(e))
             return {
                 "content": f"Error generating content: {str(e)}",
                 "excerpt": f"Error processing article: {title}",
