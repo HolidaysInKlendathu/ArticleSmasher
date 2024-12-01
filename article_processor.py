@@ -415,34 +415,45 @@ class ContentGenerator:
         return True
 
     def generate_content(self, sources: List[Dict], title: str) -> Dict:
-        """Generate article content using Claude"""
         source_texts = [f"Source {i+1} ({s['url']}):\n{s['content']}\n\n" 
                        for i, s in enumerate(sources)]
         
         combined_sources = "\n".join(source_texts)
         
         prompt = f"""
-        Write an informative article based on the provided sources.
-        Return ONLY a JSON object with no additional text.
+        Write a comprehensive, SEO-optimized article that synthesizes information from the provided sources.
 
         Requirements:
-        - Reading level: 9-10 years old
-        - Use simple sentences and short paragraphs
-        - Length: 800-1500 words
+        1. Structure:
+            - Start with an engaging introduction (2-3 paragraphs)
+            - Include 4-5 H2 subheadings for main sections
+            - Each section must have 2-3 paragraphs minimum
+            - Use proper HTML tags: <h1>, <h2>, <p> for all content
+            - Total length MUST be between 800-1500 words
         
-        Important: In your JSON response, ensure the content field has no line breaks in it - use \\n for newlines.
+        2. Writing Style:
+            - Write for a 9th-grade reading level
+            - Use short, clear sentences
+            - Each paragraph should be 2-4 sentences
+            - Include relevant statistics and data from sources
         
+        3. SEO Optimization:
+            - Include LSI keywords naturally
+            - Use descriptive subheadings
+            - Ensure proper heading hierarchy
+            - Include transition sentences between sections
+
         Title: {title}
 
         Sources:
         {combined_sources}
 
-        Return your response in this exact JSON format, making sure all text fields are properly escaped:
+        Return ONLY a JSON object in this exact format:
         {{
-            "content": "Single line of text with \\n for newlines",
-            "excerpt": "2-3 sentence summary under 550 characters",
-            "metaTitle": "SEO title under 70 characters",
-            "metaDescription": "SEO description under 150 characters",
+            "content": "Your full HTML-formatted article content with proper tags",
+            "excerpt": "Compelling 2-3 sentence summary (max 550 chars)",
+            "metaTitle": "SEO-optimized title (max 70 chars)",
+            "metaDescription": "SEO-optimized description (max 150 chars)",
             "tags": ["tag1", "tag2", "tag3"],
             "suggestedFeatures": {{
                 "hasVideo": false,
@@ -450,6 +461,8 @@ class ContentGenerator:
                 "hasGallery": false
             }}
         }}
+
+        The content MUST use proper HTML tags and be between 800-1500 words. Do not include any markdown formatting - use HTML tags instead.
         """
 
         try:
@@ -462,50 +475,19 @@ class ContentGenerator:
             
             # Clean up response text
             response_text = response.content[0].text.strip()
-            
-            # Debug print
-            print("\nRaw response beginning:")
-            print(response_text[:500])
-            
-            # Try to extract JSON if wrapped in code blocks
             if "```json" in response_text:
                 response_text = response_text.split("```json")[1].split("```")[0].strip()
             elif "```" in response_text:
                 response_text = response_text.split("```")[1].strip()
             
-            # Clean the response text - replace literal newlines with \n in content
-            cleaned_text = response_text.replace('"\n', '"\\n')
+            result = json.loads(response_text)
             
-            try:
-                result = json.loads(cleaned_text)
-            except json.JSONDecodeError:
-                # If still failing, try more aggressive cleaning
-                import re
-                cleaned_text = re.sub(r'(?<!\\)\n', '\\n', response_text)
-                result = json.loads(cleaned_text)
+            # Validate content length
+            word_count = len(result["content"].split())
+            if not (800 <= word_count <= 1500):
+                print(f"Warning: Content length ({word_count} words) outside target range. Regenerating...")
+                return self.generate_content(sources, title)  # Retry
             
-            # Ensure all required fields exist
-            required_fields = {
-                "content": "",
-                "excerpt": "",
-                "metaTitle": "",
-                "metaDescription": "",
-                "tags": [],
-                "suggestedFeatures": {
-                    "hasVideo": False,
-                    "hasAudio": False,
-                    "hasGallery": False
-                }
-            }
-            
-            for key, default_value in required_fields.items():
-                if key not in result:
-                    result[key] = default_value
-            
-            if not self.validate_content(result):
-                logging.warning("Generated content failed validation")
-                # Optionally retry or handle invalid content
-                
             return result
             
         except Exception as e:
@@ -514,7 +496,7 @@ class ContentGenerator:
                 "content": f"Error generating content: {str(e)}",
                 "excerpt": f"Error processing article: {title}",
                 "metaTitle": title[:70],
-                "metaDescription": f"Article about {title[:140]}",
+                "metaDescription": f"Learn about {title}",
                 "tags": [],
                 "suggestedFeatures": {
                     "hasVideo": False,
