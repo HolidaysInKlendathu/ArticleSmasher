@@ -415,69 +415,55 @@ class ContentGenerator:
             
         return True
 
-    def generate_content(self, sources: List[Dict], title: str, retry_count: int = 0) -> Dict:
-        """Generate article content using Claude"""
-        # Maximum number of retries
-        MAX_RETRIES = 3
-        # More flexible word count range
-        MIN_WORDS = 600
-        MAX_WORDS = 1500
-        
-        if retry_count >= MAX_RETRIES:
-            print(f"Reached maximum retries ({MAX_RETRIES}). Using best attempt.")
-            return self._generate_content_single_attempt(sources, title)
-        
-        try:
-            result = self._generate_content_single_attempt(sources, title)
-            word_count = len(result["content"].split())
-            
-            if MIN_WORDS <= word_count <= MAX_WORDS:
-                return result
-            else:
-                print(f"Warning: Content length ({word_count} words) outside target range. Attempt {retry_count + 1}/{MAX_RETRIES}")
-                return self.generate_content(sources, title, retry_count + 1)
-                
-        except Exception as e:
-            print(f"Error in content generation: {str(e)}")
-            return self._generate_fallback_content(title)
-
-    def _generate_content_single_attempt(self, sources: List[Dict], title: str) -> Dict:
-        """Single attempt at content generation"""
+    def generate_content(self, sources: List[Dict], title: str) -> Dict:
         source_texts = [f"Source {i+1} ({s['url']}):\n{s['content']}\n\n" 
                        for i, s in enumerate(sources)]
         
         combined_sources = "\n".join(source_texts)
         
         prompt = f"""
-        Write a comprehensive article about {title}. The article MUST be between 600-1500 words and follow this structure:
+        Write a comprehensive, SEO-optimized article that synthesizes information from the provided sources.
 
-        1. Start with a compelling introduction (2-3 paragraphs)
-        2. Include 3-4 main sections with descriptive H2 headings
-        3. Each section must have 2-3 paragraphs
-        4. End with a conclusion paragraph
+        Requirements:
+        1. Structure:
+            - Start with an engaging introduction (2-3 paragraphs)
+            - Include 4-5 H2 subheadings for main sections
+            - Each section must have 2-3 paragraphs minimum
+            - Use proper HTML tags: <h1>, <h2>, <p> for all content
+            - Total length MUST be between 800-1500 words
+        
+        2. Writing Style:
+            - Write for a 9th-grade reading level
+            - Use short, clear sentences
+            - Each paragraph should be 2-4 sentences
+            - Include relevant statistics and data from sources
+        
+        3. SEO Optimization:
+            - Include LSI keywords naturally
+            - Use descriptive subheadings
+            - Ensure proper heading hierarchy
+            - Include transition sentences between sections
 
-        Format Requirements:
-        - Use proper HTML tags (<h1>, <h2>, <p>)
-        - Each paragraph should be wrapped in <p> tags
-        - Include relevant statistics and data from sources
-        - Write in a clear, engaging style for general readers
+        Title: {title}
 
-        Sources to use:
+        Sources:
         {combined_sources}
 
-        Return ONLY a JSON object with this exact structure:
+        Return ONLY a JSON object in this exact format:
         {{
-            "content": "The full HTML-formatted article",
-            "excerpt": "2-3 sentence summary (max 550 chars)",
-            "metaTitle": "SEO title (max 70 chars)",
-            "metaDescription": "SEO description (max 150 chars)",
-            "tags": ["relevant", "tags", "here"],
+            "content": "Your full HTML-formatted article content with proper tags",
+            "excerpt": "Compelling 2-3 sentence summary (max 550 chars)",
+            "metaTitle": "SEO-optimized title (max 70 chars)",
+            "metaDescription": "SEO-optimized description (max 150 chars)",
+            "tags": ["tag1", "tag2", "tag3"],
             "suggestedFeatures": {{
                 "hasVideo": false,
                 "hasAudio": false,
                 "hasGallery": false
             }}
         }}
+
+        The content MUST use proper HTML tags and be between 800-1500 words. Do not include any markdown formatting - use HTML tags instead.
         """
 
         response = self.anthropic.messages.create(
@@ -648,24 +634,110 @@ class ImageProcessor:
             print(f"Error saving image: {e}")
             return f"/images/default.webp"
             
+    async def get_largest_relevant_image(self, html: str, article_title: str, url: str) -> Dict:
+        """Find the largest relevant image from the article HTML"""
+        soup = BeautifulSoup(html, 'html.parser')
+        images = []
+        
+        logging.info(f"Searching for images in article: {article_title}")
+        logging.info(f"URL: {url}")
+        
+        # Debug: Print total number of img tags found
+        all_images = soup.find_all('img')
+        logging.info(f"Total <img> tags found: {len(all_images)}")
+        
+        for img in all_images:
+            src = img.get('src')
+            if not src:
+                continue
+            
+            logging.info(f"Processing image: {src}")
+            logging.info(f"Alt text: {img.get('alt', 'None')}")
+            logging.info(f"Title: {img.get('title', 'None')}")
+            
+            # Clean and normalize the URL
+            if not src.startswith(('http://', 'https://')):
+                original_src = src
+                src = urljoin(url, src)
+                logging.info(f"Normalized URL from {original_src} to {src}")
+            
+            # Skip small icons and common non-article images
+            if any(skip in src.lower() for skip in ['icon', 'logo', 'avatar', 'ads', 'banner']):
+                logging.info("Skipping: appears to be icon/logo/banner")
+                continue
+            
+            try:
+                logging.info("Downloading image...")
+                response = requests.get(src, timeout=10)
+                
+                if response.status_code != 200:
+                    logging.info(f"Failed to download: HTTP {response.status_code}")
+                    continue
+                
+                logging.info("Checking dimensions...")
+                img_file = Image.open(io.BytesIO(response.content))
+                width, height = img_file.size
+                logging.info(f"Dimensions: {width}x{height}")
+                
+                if width >= self.min_width and height >= self.min_height:
+                    images.append({
+                        'src': src,
+                        'alt': img.get('alt', ''),
+                        'title': img.get('title', ''),
+                        'width': width,
+                        'height': height,
+                        'area': width * height
+                    })
+                    logging.info("Image added to candidates")
+                else:
+                    logging.info(f"Skipping: too small (minimum: {self.min_width}x{self.min_height})")
+            
+            except Exception as e:
+                logging.error(f"Error processing image: {str(e)}")
+        
+        if not images:
+            logging.info("No suitable images found")
+            return None
+        
+        # Sort by area and return largest
+        images.sort(key=lambda x: x['area'], reverse=True)
+        selected_image = images[0]
+        logging.info("Selected best image:")
+        logging.info(f"Source: {selected_image['src']}")
+        logging.info(f"Dimensions: {selected_image['width']}x{selected_image['height']}")
+        logging.info(f"Alt text: {selected_image['alt']}")
+        
+        return selected_image
+
     async def get_and_process_image(self, html: str, article_title: str, article_slug: str, url: str) -> str:
         """Main method to get, process and save article image"""
+        logging.info(f"Starting image processing for: {article_title}")
+        
         try:
+            logging.info("Searching for suitable image...")
             image_data = await self.get_largest_relevant_image(html, article_title, url)
             
             if image_data:
-                # Download and process image
+                logging.info(f"Downloading selected image: {image_data['src']}")
                 response = requests.get(image_data['src'])
+                
+                logging.info("Processing image...")
                 img = Image.open(io.BytesIO(response.content))
                 processed_img = self.process_image(img)
                 
-                # Save to MinIO
-                return await self.save_image(processed_img, article_slug, article_title)
-            
+                logging.info("Saving to MinIO...")
+                image_url = await self.save_image(processed_img, article_slug, article_title)
+                logging.info(f"Image saved: {image_url}")
+                return image_url
+                
+            else:
+                logging.warning("No suitable image found, using default")
+                
         except Exception as e:
-            print(f"Error processing article image: {e}")
+            logging.error(f"Error in image processing: {str(e)}")
+            logging.warning("Falling back to default image")
         
-        # Return default image path if anything fails
+        logging.info(f"Using default image: {self.default_image_path}")
         return "/images/default.webp"
 
 class ArticleProcessor(GoogleSheetsManager):
