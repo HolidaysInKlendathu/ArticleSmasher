@@ -415,118 +415,102 @@ class ContentGenerator:
             
         return True
 
-    def generate_content(self, sources: List[Dict], title: str) -> Dict:
+    def generate_content(self, sources: List[Dict], title: str, retry_count: int = 0) -> Dict:
+        """Generate article content using Claude"""
+        # Maximum number of retries
+        MAX_RETRIES = 3
+        # More flexible word count range
+        MIN_WORDS = 600
+        MAX_WORDS = 1500
+        
+        if retry_count >= MAX_RETRIES:
+            print(f"Reached maximum retries ({MAX_RETRIES}). Using best attempt.")
+            return self._generate_content_single_attempt(sources, title)
+        
+        try:
+            result = self._generate_content_single_attempt(sources, title)
+            word_count = len(result["content"].split())
+            
+            if MIN_WORDS <= word_count <= MAX_WORDS:
+                return result
+            else:
+                print(f"Warning: Content length ({word_count} words) outside target range. Attempt {retry_count + 1}/{MAX_RETRIES}")
+                return self.generate_content(sources, title, retry_count + 1)
+                
+        except Exception as e:
+            print(f"Error in content generation: {str(e)}")
+            return self._generate_fallback_content(title)
+
+    def _generate_content_single_attempt(self, sources: List[Dict], title: str) -> Dict:
+        """Single attempt at content generation"""
         source_texts = [f"Source {i+1} ({s['url']}):\n{s['content']}\n\n" 
                        for i, s in enumerate(sources)]
         
         combined_sources = "\n".join(source_texts)
         
         prompt = f"""
-        Write a comprehensive, SEO-optimized article that synthesizes information from the provided sources.
+        Write a comprehensive article about {title}. The article MUST be between 600-1500 words and follow this structure:
 
-        Requirements:
-        1. Structure:
-            - Start with an engaging introduction (2-3 paragraphs)
-            - Include 4-5 H2 subheadings for main sections
-            - Each section must have 2-3 paragraphs minimum
-            - Use proper HTML tags: <h1>, <h2>, <p> for all content
-            - Total length MUST be between 800-1500 words
-        
-        2. Writing Style:
-            - Write for a 9th-grade reading level
-            - Use short, clear sentences
-            - Each paragraph should be 2-4 sentences
-            - Include relevant statistics and data from sources
-        
-        3. SEO Optimization:
-            - Include LSI keywords naturally
-            - Use descriptive subheadings
-            - Ensure proper heading hierarchy
-            - Include transition sentences between sections
+        1. Start with a compelling introduction (2-3 paragraphs)
+        2. Include 3-4 main sections with descriptive H2 headings
+        3. Each section must have 2-3 paragraphs
+        4. End with a conclusion paragraph
 
-        Title: {title}
+        Format Requirements:
+        - Use proper HTML tags (<h1>, <h2>, <p>)
+        - Each paragraph should be wrapped in <p> tags
+        - Include relevant statistics and data from sources
+        - Write in a clear, engaging style for general readers
 
-        Sources:
+        Sources to use:
         {combined_sources}
 
-        Return ONLY a JSON object in this exact format:
+        Return ONLY a JSON object with this exact structure:
         {{
-            "content": "Your full HTML-formatted article content with proper tags",
-            "excerpt": "Compelling 2-3 sentence summary (max 550 chars)",
-            "metaTitle": "SEO-optimized title (max 70 chars)",
-            "metaDescription": "SEO-optimized description (max 150 chars)",
-            "tags": ["tag1", "tag2", "tag3"],
+            "content": "The full HTML-formatted article",
+            "excerpt": "2-3 sentence summary (max 550 chars)",
+            "metaTitle": "SEO title (max 70 chars)",
+            "metaDescription": "SEO description (max 150 chars)",
+            "tags": ["relevant", "tags", "here"],
             "suggestedFeatures": {{
                 "hasVideo": false,
                 "hasAudio": false,
                 "hasGallery": false
             }}
         }}
-
-        The content MUST use proper HTML tags and be between 800-1500 words. Do not include any markdown formatting - use HTML tags instead.
         """
 
-        try:
-            response = self.anthropic.messages.create(
-                model="claude-3-sonnet-20240229",
-                max_tokens=4000,
-                temperature=0.7,
-                messages=[{"role": "user", "content": prompt}]
-            )
-            
-            # Clean up response text
-            response_text = response.content[0].text.strip()
-            if "```json" in response_text:
-                response_text = response_text.split("```json")[1].split("```")[0].strip()
-            elif "```" in response_text:
-                response_text = response_text.split("```")[1].strip()
-            
-            # Clean control characters before parsing JSON
-            response_text = re.sub(r'[\x00-\x1F\x7F-\x9F]', '', response_text)
-            
-            try:
-                result = json.loads(response_text)
-            except json.JSONDecodeError as e:
-                print(f"JSON parsing error: {e}")
-                print("Response text:", response_text[:200])  # Print first 200 chars for debugging
-                
-                # Fallback content
-                return {
-                    "content": f"<h1>{title}</h1>\n<p>Content generation failed. Please try again.</p>",
-                    "excerpt": f"Article about {title}",
-                    "metaTitle": title[:70],
-                    "metaDescription": f"Learn about {title}",
-                    "tags": [],
-                    "suggestedFeatures": {
-                        "hasVideo": False,
-                        "hasAudio": False,
-                        "hasGallery": False
-                    }
-                }
-            
-            # Validate content length
-            word_count = len(result["content"].split())
-            if not (800 <= word_count <= 1500):
-                print(f"Warning: Content length ({word_count} words) outside target range. Regenerating...")
-                return self.generate_content(sources, title)  # Retry
-            
-            return result
-            
-        except Exception as e:
-            print(f"Error generating content: {str(e)}")
-            print("Full error:", str(e.__class__.__name__), str(e))
-            return {
-                "content": f"Error generating content: {str(e)}",
-                "excerpt": f"Error processing article: {title}",
-                "metaTitle": title[:70],
-                "metaDescription": f"Learn about {title}",
-                "tags": [],
-                "suggestedFeatures": {
-                    "hasVideo": False,
-                    "hasAudio": False,
-                    "hasGallery": False
-                }
+        response = self.anthropic.messages.create(
+            model="claude-3-sonnet-20240229",
+            max_tokens=4000,
+            temperature=0.7,
+            messages=[{"role": "user", "content": prompt}]
+        )
+        
+        response_text = response.content[0].text.strip()
+        if "```json" in response_text:
+            response_text = response_text.split("```json")[1].split("```")[0].strip()
+        elif "```" in response_text:
+            response_text = response_text.split("```")[1].strip()
+        
+        response_text = re.sub(r'[\x00-\x1F\x7F-\x9F]', '', response_text)
+        
+        return json.loads(response_text)
+
+    def _generate_fallback_content(self, title: str) -> Dict:
+        """Generate fallback content when all attempts fail"""
+        return {
+            "content": f"<h1>{title}</h1>\n<p>Content generation failed after multiple attempts. Please try again.</p>",
+            "excerpt": f"Article about {title}",
+            "metaTitle": title[:70],
+            "metaDescription": f"Learn about {title}",
+            "tags": [],
+            "suggestedFeatures": {
+                "hasVideo": False,
+                "hasAudio": False,
+                "hasGallery": False
             }
+        }
 
     def create_article_markdown(self, content_data: Dict, article_data: Dict) -> str:
         """Create markdown file content using template"""
