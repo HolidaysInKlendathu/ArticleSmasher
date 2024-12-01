@@ -138,7 +138,7 @@ class DatabaseHandler:
                             article_data["coverImage"],
                             article_data["readingTime"],
                             article_data["wordCount"],
-                            "DRAFT",  # status
+                            "PUBLISHED",
                             article_data["metaTitle"],
                             article_data["metaDescription"],
                             article_data["featured"],
@@ -683,7 +683,7 @@ class ArticleProcessor(GoogleSheetsManager):
                 "coverImage": "/images/default.webp",
                 "readingTime": math.ceil(len(content_data["content"].split()) / 200),
                 "wordCount": len(content_data["content"].split()),
-                "status": "DRAFT",
+                "status": "PUBLISHED",
                 "metaTitle": content_data["metaTitle"],
                 "metaDescription": content_data["metaDescription"],
                 "featured": False,
