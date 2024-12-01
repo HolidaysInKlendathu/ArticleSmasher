@@ -8,7 +8,7 @@ from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 from typing import List, Dict, Optional, Tuple
 from slugify import slugify
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urljoin
 import trafilatura
 from concurrent.futures import ThreadPoolExecutor
 from anthropic import Anthropic
@@ -19,6 +19,9 @@ import pymysql
 import uuid
 import logging
 from tenacity import retry, stop_after_attempt, wait_exponential
+from PIL import Image
+import io
+import requests
 
 
 # Import our GoogleSheetsManager
@@ -599,6 +602,83 @@ class ContentGenerator:
             print(f"Error saving to MinIO: {e}")
             return None
 
+class ImageProcessor:
+    def __init__(self, minio_client):
+        self.minio_client = minio_client
+        self.min_width = 800
+        self.min_height = 600
+        self.aspect_ratio = 16/9
+        self.default_image_path = "C:/Users/Usuario/Desktop/Cursor/NewsMag/public/images/default.webp"
+        
+    def process_image(self, image: Image.Image) -> Image.Image:
+        """Convert to black and white and crop to 16:9 aspect ratio"""
+        # Convert to black and white
+        bw_image = image.convert('L')
+        
+        # Calculate target dimensions for 16:9
+        current_ratio = image.width / image.height
+        
+        if current_ratio > self.aspect_ratio:
+            # Image is too wide
+            new_width = int(image.height * self.aspect_ratio)
+            offset = (image.width - new_width) // 2
+            bw_image = bw_image.crop((offset, 0, offset + new_width, image.height))
+        else:
+            # Image is too tall
+            new_height = int(image.width / self.aspect_ratio)
+            offset = (image.height - new_height) // 2
+            bw_image = bw_image.crop((0, offset, image.width, offset + new_height))
+            
+        return bw_image
+        
+    async def save_image(self, image: Image.Image, article_slug: str, article_title: str) -> str:
+        """Save processed image to MinIO"""
+        try:
+            # Generate filename from article title
+            safe_title = slugify(article_title)[:50]  # Limit length
+            filename = f"{safe_title}-{uuid.uuid4().hex[:8]}.webp"
+            bucket_name = os.getenv("MINIO_BUCKET")
+            file_path = f"images/articles/{article_slug}/{filename}"
+            
+            # Convert to WebP format
+            buffer = io.BytesIO()
+            image.save(buffer, format="WEBP", quality=85)
+            buffer.seek(0)
+            
+            self.minio_client.put_object(
+                bucket_name,
+                file_path,
+                buffer,
+                length=buffer.getbuffer().nbytes,
+                content_type="image/webp"
+            )
+            
+            return f"{os.getenv('MINIO_ENDPOINT')}/{bucket_name}/{file_path}"
+            
+        except Exception as e:
+            print(f"Error saving image: {e}")
+            return f"/images/default.webp"
+            
+    async def get_and_process_image(self, html: str, article_title: str, article_slug: str, url: str) -> str:
+        """Main method to get, process and save article image"""
+        try:
+            image_data = await self.get_largest_relevant_image(html, article_title, url)
+            
+            if image_data:
+                # Download and process image
+                response = requests.get(image_data['src'])
+                img = Image.open(io.BytesIO(response.content))
+                processed_img = self.process_image(img)
+                
+                # Save to MinIO
+                return await self.save_image(processed_img, article_slug, article_title)
+            
+        except Exception as e:
+            print(f"Error processing article image: {e}")
+        
+        # Return default image path if anything fails
+        return "/images/default.webp"
+
 class ArticleProcessor(GoogleSheetsManager):
     def __init__(self):
         super().__init__(os.getenv('GOOGLE_APPLICATION_CREDENTIALS', './google-credentials.json'))
@@ -606,6 +686,7 @@ class ArticleProcessor(GoogleSheetsManager):
         self.category_detector = CategoryDetector()
         self.content_generator = ContentGenerator()
         self.db_handler = DatabaseHandler(os.getenv('DATABASE_URL'))
+        self.image_processor = ImageProcessor(self.content_generator.minio_client)
 
     async def get_articles(self):
         """Get articles from sheet"""
