@@ -233,21 +233,32 @@ class ArticleScraper:
         """Scrape content from a URL using trafilatura for better content extraction"""
         try:
             await self.init_session()
+            logging.info(f"\nAttempting to scrape: {url}")
+            
             async with self.session.get(url) as response:
                 if response.status != 200:
+                    logging.error(f"ERROR: HTTP {response.status} error fetching URL")
                     return {"error": f"HTTP {response.status}", "content": None}
                 
                 html = await response.text()
+                logging.info(f"Retrieved HTML content length: {len(html)} characters")
                 
                 # Use trafilatura for main content extraction
                 content = trafilatura.extract(html, include_comments=False, 
-                                           include_tables=True,
-                                           include_images=False,
-                                           include_links=False)
+                                         include_tables=True,
+                                         include_images=False,
+                                         include_links=False)
                 
                 if not content:
-                    # Fallback to BeautifulSoup if trafilatura fails
+                    logging.warning("WARNING: Trafilatura failed to extract content, falling back to BeautifulSoup")
+                    # Fallback to BeautifulSoup
                     soup = BeautifulSoup(html, 'html.parser')
+                    
+                    # Debug print of HTML structure
+                    logging.info("HTML Structure Overview:")
+                    logging.info(f"- Found {len(soup.find_all('article'))} article tags")
+                    logging.info(f"- Found {len(soup.find_all('p'))} paragraph tags")
+                    logging.info(f"- Found {len(soup.find_all('img'))} image tags")
                     
                     # Remove unwanted elements
                     for element in soup.find_all(['script', 'style', 'nav', 'header', 'footer']):
@@ -257,10 +268,17 @@ class ArticleScraper:
                     article = soup.find('article') or soup.find(class_=['content', 'article', 'post'])
                     if article:
                         content = article.get_text(separator='\n', strip=True)
+                        logging.info("SUCCESS: Found main content in article tag")
                     else:
                         # Fallback to all paragraphs
                         paragraphs = soup.find_all('p')
                         content = '\n'.join(p.get_text().strip() for p in paragraphs if p.get_text().strip())
+                        logging.info(f"INFO: Extracted content from {len(paragraphs)} paragraphs")
+
+                if content:
+                    logging.info(f"SUCCESS: Successfully extracted content ({len(content)} characters)")
+                else:
+                    logging.error("ERROR: Failed to extract any content")
 
                 return {
                     "url": url,
@@ -270,6 +288,7 @@ class ArticleScraper:
                 }
 
         except Exception as e:
+            logging.error(f"ERROR: Error scraping URL: {str(e)}")
             return {"error": str(e), "content": None, "url": url}
 
 class CategoryDetector:
@@ -788,119 +807,48 @@ class ArticleProcessor(GoogleSheetsManager):
 
     async def process_article(self, article_data: Dict) -> Dict:
         """Process a single article with all its sources"""
+        logging.info(f"\nProcessing article: {article_data['title']}")
         source_contents = []
         
         # Scrape all source URLs
         for source in article_data["source_urls"]:
+            logging.info(f"\nProcessing source: {source['url']}")
             content = await self.scraper.scrape_url(source["url"])
             if not content["error"] and content["content"]:
                 source_contents.append(content)
+                logging.info(f"SUCCESS: Successfully scraped content ({len(content['content'])} chars)")
+            else:
+                logging.warning(f"WARNING: Failed to scrape content: {content.get('error', 'Unknown error')}")
         
         if not source_contents:
+            logging.error("ERROR: No content could be scraped from any source")
             return {"error": "No content could be scraped from any source"}
         
-        # Combine contents for category detection
-        combined_content = "\n".join(s["content"] for s in source_contents)
-        
-        # Detect categories
-        categories = self.category_detector.detect_categories(combined_content)
-        
-        result = {
-            "title": article_data["title"],
-            "slug": article_data["slug"],
-            "final_url": article_data["final_url"],
-            "sources": source_contents,
-            "primary_category": {
-                "slug": categories["primary"]["category"],
-                "name": self.category_detector.get_category_name(categories["primary"]["category"]),
-                "subcategory": {
-                    "slug": categories["primary"]["subcategory"],
-                    "name": self.category_detector.get_subcategory_name(
-                        categories["primary"]["category"],
-                        categories["primary"]["subcategory"]
-                    )
-                }
-            },
-            "additional_categories": [
-                {
-                    "slug": cat["category"],
-                    "name": self.category_detector.get_category_name(cat["category"]),
-                    "subcategory": {
-                        "slug": cat["subcategory"],
-                        "name": self.category_detector.get_subcategory_name(
-                            cat["category"],
-                            cat["subcategory"]
-                        )
-                    },
-                    "score": cat["score"]
-                }
-                for cat in categories["additional"]
-            ]
-        }
+        # Log content stats
+        logging.info("\nContent Statistics:")
+        for idx, source in enumerate(source_contents, 1):
+            logging.info(f"Source {idx}: {len(source['content'])} chars from {source['domain']}")
 
-        # Generate content using Claude
         try:
+            # Generate content
+            logging.info("\nGenerating content using Claude...")
             content_data = self.content_generator.generate_content(source_contents, article_data["title"])
             
             # Create markdown
+            logging.info("Creating markdown content...")
             markdown_content = self.content_generator.create_article_markdown(content_data, result)
             
             # Save to MinIO
+            logging.info("Saving to MinIO...")
             storage_url = await self.content_generator.save_to_minio(markdown_content, result["slug"])
-
-            # Prepare article data for database
-            db_article_data = {
-                "title": result["title"],
-                "slug": result["slug"],
-                "content": content_data["content"],
-                "markdownUrl": storage_url,
-                "excerpt": content_data["excerpt"],
-                "coverImage": "/images/default.webp",
-                "readingTime": math.ceil(len(content_data["content"].split()) / 200),
-                "wordCount": len(content_data["content"].split()),
-                "status": "PUBLISHED",
-                "metaTitle": content_data["metaTitle"],
-                "metaDescription": content_data["metaDescription"],
-                "featured": False,
-                "spotlight": False,
-                "evergreen": False,
-                "sponsored": False,
-                "sponsorName": "",
-                "partnerContent": False,
-                "affiliate": False,
-                "crowdsourced": False,
-                "premium": False,
-                "hasVideo": content_data["suggestedFeatures"]["hasVideo"],
-                "hasAudio": content_data["suggestedFeatures"]["hasAudio"],
-                "hasGallery": content_data["suggestedFeatures"]["hasGallery"],
-                "authorId": "cm3pw0m9u00026hqfvtiqmtcw",
-                "categories": [
-                    result["primary_category"]["slug"],
-                    *[cat["slug"] for cat in result.get("additional_categories", [])]
-                ],
-                "tags": content_data["tags"]
-            }
             
-            # Update database
-            if storage_url and 'error' not in result:
-                db_update_success = self.db_handler.create_or_update_article(db_article_data)
-                if db_update_success:
-                    result["database_updated"] = True
-                    print(f"Database updated for article: {result['title']}")
-                else:
-                    result["database_updated"] = False
-                    print(f"Failed to update database for article: {result['title']}")
-            
-            result.update({
-                "storage_url": storage_url,
-                "markdown_content": markdown_content,
-                "generated_content": content_data
-            })
+            logging.info(f"SUCCESS: Successfully saved to: {storage_url}")
             
         except Exception as e:
-            print(f"Error in content generation: {e}")
+            logging.error(f"ERROR: Error in content generation: {str(e)}")
+            logging.error(f"Full error: {e.__class__.__name__}: {str(e)}")
             result["error"] = f"Content generation failed: {str(e)}"
-        
+
         return result
 
 async def main():
