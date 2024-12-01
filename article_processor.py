@@ -17,12 +17,23 @@ from minio import Minio
 from datetime import datetime
 import pymysql
 import uuid
+import logging
+from tenacity import retry, stop_after_attempt, wait_exponential
 
 
 # Import our GoogleSheetsManager
 from sheets_setup import GoogleSheetsManager
 
 load_dotenv()
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('article_processor.log'),
+        logging.StreamHandler()
+    ]
+)
 
 class DatabaseHandler:
     def __init__(self, database_url: str):
@@ -213,6 +224,7 @@ class ArticleScraper:
             await self.session.close()
             self.session = None
 
+    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10))
     async def scrape_url(self, url: str) -> Dict:
         """Scrape content from a URL using trafilatura for better content extraction"""
         try:
@@ -382,6 +394,23 @@ class ContentGenerator:
             print(f"Error loading template: {e}")
             self.template = None
 
+    def validate_content(self, content_data: Dict) -> bool:
+        """Validate generated content meets requirements"""
+        word_count = len(content_data["content"].split())
+        if not (800 <= word_count <= 1500):
+            logging.warning(f"Content length ({word_count} words) outside target range")
+            return False
+            
+        if len(content_data["metaTitle"]) > 70:
+            logging.warning("Meta title too long")
+            return False
+            
+        if len(content_data["metaDescription"]) > 150:
+            logging.warning("Meta description too long")
+            return False
+            
+        return True
+
     def generate_content(self, sources: List[Dict], title: str) -> Dict:
         """Generate article content using Claude"""
         source_texts = [f"Source {i+1} ({s['url']}):\n{s['content']}\n\n" 
@@ -470,6 +499,10 @@ class ContentGenerator:
                 if key not in result:
                     result[key] = default_value
             
+            if not self.validate_content(result):
+                logging.warning("Generated content failed validation")
+                # Optionally retry or handle invalid content
+                
             return result
             
         except Exception as e:
@@ -768,3 +801,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
