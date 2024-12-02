@@ -30,32 +30,30 @@ class ContentGenerator:
             
             combined_sources = "\n".join(source_texts)
             
-            prompt = f"""
-            You are a professional content writer. Write a comprehensive article that synthesizes information from the provided sources.
-            
-            Return ONLY a JSON object in this exact format, with no additional text or formatting:
-            {{
-                "content": "# {title}\\n\\nIntroduction...\\n\\n## Section 1\\n\\nContent...\\n\\n## Section 2\\n\\nContent...",
-                "excerpt": "Brief summary",
-                "metaTitle": "{title}",
-                "metaDescription": "Learn about {title}",
-                "tags": ["tag1", "tag2"],
-                "suggestedFeatures": {{
-                    "hasVideo": false,
-                    "hasAudio": false,
-                    "hasGallery": false
-                }}
-            }}
+            prompt = f"""You are a professional content writer. Write a comprehensive article that synthesizes information from the provided sources.
 
-            Sources to synthesize:
-            {combined_sources}
+Return ONLY a valid JSON object with this exact structure (no additional text):
+{{
+    "content": "# {title}\\n\\nIntroduction paragraph...\\n\\n## First Section\\n\\nContent...\\n\\n## Second Section\\n\\nContent...",
+    "excerpt": "Brief 1-2 sentence summary",
+    "metaTitle": "{title}",
+    "metaDescription": "Learn about {title}",
+    "tags": ["tag1", "tag2"],
+    "suggestedFeatures": {{
+        "hasVideo": false,
+        "hasAudio": false,
+        "hasGallery": false
+    }}
+}}
 
-            Requirements:
-            1. Content should be 800-1200 words
-            2. Use proper markdown formatting
-            3. Write in a simple, engaging style
-            4. Include 3-4 main sections with H2 headings
-            """
+Sources to synthesize:
+{combined_sources}
+
+Requirements:
+1. Content should be 800-1200 words
+2. Use proper markdown formatting
+3. Write in a simple, engaging style
+4. Include 3-4 main sections with H2 headings"""
 
             response = self.anthropic.messages.create(
                 model="claude-3-sonnet-20240229",
@@ -64,10 +62,7 @@ class ContentGenerator:
                 messages=[{"role": "user", "content": prompt}]
             )
             
-            # Clean up response text
             response_text = response.content[0].text.strip()
-            logging.info("Raw response from Claude:")
-            logging.info(response_text[:500] + "...")  # Log first 500 chars
             
             # Extract JSON
             if "```json" in response_text:
@@ -80,27 +75,23 @@ class ContentGenerator:
                 return result
             except json.JSONDecodeError as e:
                 logging.error(f"JSON parsing error: {str(e)}")
-                logging.error(f"Attempted to parse: {response_text[:500]}...")
-                # Return fallback content
-                return {
-                    "content": f"# {title}\n\nContent generation failed. Please try again.",
-                    "excerpt": f"Article about {title}",
-                    "metaTitle": title[:70],
-                    "metaDescription": f"Learn about {title}",
-                    "tags": [],
-                    "suggestedFeatures": {"hasVideo": False, "hasAudio": False, "hasGallery": False}
-                }
+                logging.error(f"Raw response: {response_text[:500]}...")
+                return self._generate_fallback_content(title)
                 
         except Exception as e:
             logging.error(f"Error in content generation: {str(e)}")
-            return {
-                "content": f"# {title}\n\nError: {str(e)}",
-                "excerpt": f"Article about {title}",
-                "metaTitle": title[:70],
-                "metaDescription": f"Learn about {title}",
-                "tags": [],
-                "suggestedFeatures": {"hasVideo": False, "hasAudio": False, "hasGallery": False}
-            }
+            return self._generate_fallback_content(title)
+
+    def _generate_fallback_content(self, title: str) -> Dict:
+        """Generate fallback content when main generation fails"""
+        return {
+            "content": f"# {title}\n\nContent generation failed. Please try again.",
+            "excerpt": f"Article about {title}",
+            "metaTitle": title[:70],
+            "metaDescription": f"Learn about {title}",
+            "tags": [],
+            "suggestedFeatures": {"hasVideo": False, "hasAudio": False, "hasGallery": False}
+        }
 
     def create_article_markdown(self, content_data: Dict, article_data: Dict) -> str:
         """Create markdown file content using template"""
@@ -108,13 +99,6 @@ class ContentGenerator:
             # Calculate reading time
             word_count = len(content_data["content"].split())
             reading_time = math.ceil(word_count / 200)
-            
-            # Ensure primary_category exists
-            if "primary_category" not in article_data:
-                article_data["primary_category"] = {
-                    "slug": "uncategorized",
-                    "subcategory": {"slug": "general"}
-                }
             
             # Prepare template variables
             template_vars = {

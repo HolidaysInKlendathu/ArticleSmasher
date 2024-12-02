@@ -807,37 +807,59 @@ class ArticleProcessor(GoogleSheetsManager):
 
     async def process_article(self, article_data: Dict) -> Dict:
         """Process a single article with all its sources"""
-        logging.info(f"\nProcessing article: {article_data['title']}")
-        source_contents = []
+        # Initialize default primary category if not present
+        if "primary_category" not in article_data:
+            article_data["primary_category"] = {
+                "name": "Uncategorized",
+                "slug": "uncategorized",
+                "subcategory": {
+                    "name": "General",
+                    "slug": "general"
+                }
+            }
         
-        # Scrape all source URLs
-        for source in article_data["source_urls"]:
-            logging.info(f"\nProcessing source: {source['url']}")
-            content = await self.scraper.scrape_url(source["url"])
-            if not content["error"] and content["content"]:
-                source_contents.append(content)
-                logging.info(f"SUCCESS: Successfully scraped content ({len(content['content'])} chars)")
-            else:
-                logging.warning(f"WARNING: Failed to scrape content: {content.get('error', 'Unknown error')}")
-        
-        if not source_contents:
-            logging.error("ERROR: No content could be scraped from any source")
-            return {"error": "No content could be scraped from any source"}
-        
-        # Log content stats
-        logging.info("\nContent Statistics:")
-        for idx, source in enumerate(source_contents, 1):
-            logging.info(f"Source {idx}: {len(source['content'])} chars from {source['domain']}")
+        # Initialize slug if not present
+        if "slug" not in article_data:
+            article_data["slug"] = slugify(article_data["title"])
 
         try:
+            logging.info(f"\nProcessing article: {article_data['title']}")
+            source_contents = []
+            
+            # Scrape all source URLs
+            for source in article_data["source_urls"]:
+                logging.info(f"\nProcessing source: {source['url']}")
+                content = await self.scraper.scrape_url(source["url"])
+                if not content["error"] and content["content"]:
+                    source_contents.append(content)
+                    logging.info(f"SUCCESS: Successfully scraped content ({len(content['content'])} chars)")
+                else:
+                    logging.warning(f"WARNING: Failed to scrape content: {content.get('error', 'Unknown error')}")
+            
+            if not source_contents:
+                logging.error("ERROR: No content could be scraped from any source")
+                return {"error": "No content could be scraped from any source"}
+            
+            # Log content stats
+            logging.info("\nContent Statistics:")
+            for idx, source in enumerate(source_contents, 1):
+                logging.info(f"Source {idx}: {len(source['content'])} chars from {source['domain']}")
+
             # Generate content
             logging.info("\nGenerating content using Claude...")
             content_data = self.content_generator.generate_content(source_contents, article_data["title"])
             
+            if not content_data:
+                raise Exception("Failed to generate content")
+
             # Create markdown
             logging.info("Creating markdown content...")
-            markdown_content = self.content_generator.create_article_markdown(content_data, article_data)
-            
+            try:
+                markdown_content = self.content_generator.create_article_markdown(content_data, article_data)
+            except Exception as e:
+                logging.error(f"Error creating markdown: {str(e)}")
+                raise
+
             # Save to MinIO
             logging.info("Saving to MinIO...")
             storage_url = await self.content_generator.save_to_minio(markdown_content, article_data["slug"])
@@ -852,13 +874,11 @@ class ArticleProcessor(GoogleSheetsManager):
                 "tags": content_data.get("tags", [])
             })
             
-            logging.info(f"SUCCESS: Successfully saved to: {storage_url}")
             return article_data
             
         except Exception as e:
-            logging.error(f"ERROR: Error in content generation: {str(e)}")
-            logging.error(f"Full error: {e.__class__.__name__}: {str(e)}")
-            article_data["error"] = f"Content generation failed: {str(e)}"
+            logging.error(f"Error processing article: {str(e)}")
+            article_data["error"] = str(e)
             return article_data
 
 async def main():
