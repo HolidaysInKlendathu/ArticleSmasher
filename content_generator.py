@@ -7,6 +7,7 @@ import yaml
 from minio import Minio
 import math
 import logging
+import re
 
 class ContentGenerator:
     def __init__(self):
@@ -32,9 +33,9 @@ class ContentGenerator:
             
             prompt = f"""You are a professional content writer. Write a comprehensive article that synthesizes information from the provided sources.
 
-Return ONLY a valid JSON object with this exact structure (no additional text):
+Return ONLY a valid JSON object with this exact structure (no additional text or formatting):
 {{
-    "content": "# {title}\\n\\nIntroduction paragraph...\\n\\n## First Section\\n\\nContent...\\n\\n## Second Section\\n\\nContent...",
+    "content": "<h1>{title}</h1>\\n<p>Introduction paragraph...</p>\\n<h2>First Section</h2>\\n<p>Content...</p>",
     "excerpt": "Brief 1-2 sentence summary",
     "metaTitle": "{title}",
     "metaDescription": "Learn about {title}",
@@ -50,10 +51,11 @@ Sources to synthesize:
 {combined_sources}
 
 Requirements:
-1. Content should be 800-1200 words
-2. Use proper markdown formatting
-3. Write in a simple, engaging style
-4. Include 3-4 main sections with H2 headings"""
+1. Content must be 800-1500 words
+2. Use proper HTML tags (<h1>, <h2>, <p>)
+3. Write in a clear, engaging style
+4. Include 3-4 main sections with H2 headings
+5. Return ONLY the JSON object - no other text or formatting"""
 
             response = self.anthropic.messages.create(
                 model="claude-3-sonnet-20240229",
@@ -63,19 +65,37 @@ Requirements:
             )
             
             response_text = response.content[0].text.strip()
+            logging.debug(f"Raw response from Claude: {response_text[:500]}...")
             
-            # Extract JSON
+            # Clean up the response text
             if "```json" in response_text:
                 response_text = response_text.split("```json")[1].split("```")[0].strip()
             elif "```" in response_text:
                 response_text = response_text.split("```")[1].strip()
             
+            # Remove any potential leading/trailing characters
+            response_text = re.sub(r'^[^{]*', '', response_text)
+            response_text = re.sub(r'[^}]*$', '', response_text)
+            
             try:
+                # Log the cleaned response for debugging
+                logging.debug(f"Cleaned response text: {response_text[:500]}...")
+                
                 result = json.loads(response_text)
+                
+                # Validate the required fields
+                required_fields = ["content", "excerpt", "metaTitle", "metaDescription", "tags", "suggestedFeatures"]
+                missing_fields = [field for field in required_fields if field not in result]
+                
+                if missing_fields:
+                    logging.error(f"Missing required fields in response: {missing_fields}")
+                    return self._generate_fallback_content(title)
+                    
                 return result
+                
             except json.JSONDecodeError as e:
                 logging.error(f"JSON parsing error: {str(e)}")
-                logging.error(f"Raw response: {response_text[:500]}...")
+                logging.error(f"Problematic response text: {response_text[:500]}...")
                 return self._generate_fallback_content(title)
                 
         except Exception as e:
@@ -85,7 +105,7 @@ Requirements:
     def _generate_fallback_content(self, title: str) -> Dict:
         """Generate fallback content when main generation fails"""
         return {
-            "content": f"# {title}\n\nContent generation failed. Please try again.",
+            "content": f"<h1>{title}</h1>\n<p>Content generation failed. Please try again.</p>",
             "excerpt": f"Article about {title}",
             "metaTitle": title[:70],
             "metaDescription": f"Learn about {title}",

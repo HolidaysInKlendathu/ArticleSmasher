@@ -1,0 +1,186 @@
+2024-12-02 15:19:16,458 - INFO - file_cache is only supported with oauth2client<4.0.0
+2024-12-02 15:19:19,155 - INFO - 
+Processing source: https://www.aol.com/why-won-t-supplemental-security-150628592.html
+2024-12-02 15:19:19,156 - INFO - 
+Attempting to scrape: https://www.aol.com/why-won-t-supplemental-security-150628592.html
+2024-12-02 15:19:19,991 - INFO - Retrieved HTML content length: 363402 characters
+2024-12-02 15:19:20,056 - INFO - SUCCESS: Successfully extracted content (3439 characters)
+2024-12-02 15:19:20,057 - INFO - SUCCESS: Successfully scraped content (3439 chars)
+2024-12-02 15:19:20,059 - INFO - 
+Processing source: https://www.washingtonexaminer.com/policy/finance-and-economy/3246019/why-you-wont-get-a-supplemental-security-income-check-in-december/
+2024-12-02 15:19:20,060 - INFO - 
+Attempting to scrape: https://www.washingtonexaminer.com/policy/finance-and-economy/3246019/why-you-wont-get-a-supplemental-security-income-check-in-december/
+2024-12-02 15:19:20,349 - INFO - Retrieved HTML content length: 366683 characters
+2024-12-02 15:19:20,405 - INFO - SUCCESS: Successfully extracted content (1905 characters)
+2024-12-02 15:19:20,406 - INFO - SUCCESS: Successfully scraped content (1905 chars)
+2024-12-02 15:19:20,406 - INFO - 
+Processing source: https://www.usatoday.com/story/money/2024/11/27/ssi-payments-november-schedule-extra-check/76623496007/
+2024-12-02 15:19:20,407 - INFO - 
+Attempting to scrape: https://www.usatoday.com/story/money/2024/11/27/ssi-payments-november-schedule-extra-check/76623496007/
+2024-12-02 15:19:20,732 - INFO - Retrieved HTML content length: 161625 characters
+2024-12-02 15:19:20,756 - INFO - SUCCESS: Successfully extracted content (4049 characters)
+2024-12-02 15:19:20,757 - INFO - SUCCESS: Successfully scraped content (4049 chars)
+2024-12-02 15:19:20,757 - INFO - 
+Content Statistics:
+2024-12-02 15:19:20,758 - INFO - Source 1: 3439 chars from www.aol.com
+2024-12-02 15:19:20,758 - INFO - Source 2: 1905 chars from www.washingtonexaminer.com
+2024-12-02 15:19:20,758 - INFO - Source 3: 4049 chars from www.usatoday.com
+2024-12-02 15:19:20,759 - INFO - 
+Generating content using Claude...
+2024-12-02 15:19:41,476 - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2024-12-02 15:19:41,592 - ERROR - JSON parsing error: Invalid control character at: line 2 column 70 (char 71)
+2024-12-02 15:19:41,593 - ERROR - Problematic response text: {
+    "content": "<h1>December SSI Payments: What You Need to Know</h1>
+<p>For millions of Americans who rely on Supplemental Security Income (SSI) benefits, December 2024 and the first few months of 2025 will bring some unexpected changes to the payment schedule. Due to calendar quirks, SSI beneficiaries will receive their payments on different dates than usual, and in some cases, they may even receive two payments in one month or skip a month entirely. Understanding these changes is crucial fo...
+2024-12-02 15:19:41,594 - INFO - Creating markdown content...
+2024-12-02 15:19:41,594 - INFO - Saving to MinIO...
+2024-12-02 15:19:43,158 - INFO - 
+Processing source: https://www.marketbeat.com/instant-alerts/lavaca-capital-llc-makes-new-investment-in-centerpoint-energy-inc-nysecnp-2024-12-01/
+2024-12-02 15:19:43,159 - INFO - 
+Attempting to scrape: https://www.marketbeat.com/instant-alerts/lavaca-capital-llc-makes-new-investment-in-centerpoint-energy-inc-nysecnp-2024-12-01/
+2024-12-02 15:19:43,540 - INFO - Retrieved HTML content length: 236121 characters
+2024-12-02 15:19:43,757 - INFO - SUCCESS: Successfully extracted content (6575 characters)
+2024-12-02 15:19:43,758 - INFO - SUCCESS: Successfully scraped content (6575 chars)
+2024-12-02 15:19:43,758 - INFO - 
+Processing source: https://www.marketbeat.com/instant-alerts/verition-fund-management-llc-sells-198556-shares-of-centerpoint-energy-inc-nysecnp-2024-11-30/
+2024-12-02 15:19:43,759 - INFO - 
+Attempting to scrape: https://www.marketbeat.com/instant-alerts/verition-fund-management-llc-sells-198556-shares-of-centerpoint-energy-inc-nysecnp-2024-11-30/
+2024-12-02 15:19:43,945 - INFO - Retrieved HTML content length: 235757 characters
+2024-12-02 15:19:43,994 - INFO - SUCCESS: Successfully extracted content (6187 characters)
+2024-12-02 15:19:43,995 - INFO - SUCCESS: Successfully scraped content (6187 chars)
+2024-12-02 15:19:43,995 - INFO - 
+Processing source: https://www.marketbeat.com/instant-alerts/240033-shares-in-centerpoint-energy-inc-nysecnp-purchased-by-bridgewater-associates-lp-2024-11-30/
+2024-12-02 15:19:43,996 - INFO - 
+Attempting to scrape: https://www.marketbeat.com/instant-alerts/240033-shares-in-centerpoint-energy-inc-nysecnp-purchased-by-bridgewater-associates-lp-2024-11-30/
+2024-12-02 15:19:44,193 - INFO - Retrieved HTML content length: 234154 characters
+2024-12-02 15:19:44,236 - INFO - SUCCESS: Successfully extracted content (5378 characters)
+2024-12-02 15:19:44,237 - INFO - SUCCESS: Successfully scraped content (5378 chars)
+2024-12-02 15:19:44,237 - INFO - 
+Content Statistics:
+2024-12-02 15:19:44,237 - INFO - Source 1: 6575 chars from www.marketbeat.com
+2024-12-02 15:19:44,238 - INFO - Source 2: 6187 chars from www.marketbeat.com
+2024-12-02 15:19:44,238 - INFO - Source 3: 5378 chars from www.marketbeat.com
+2024-12-02 15:19:44,238 - INFO - 
+Generating content using Claude...
+2024-12-02 15:19:55,042 - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2024-12-02 15:19:55,082 - ERROR - JSON parsing error: Invalid control character at: line 2 column 72 (char 73)
+2024-12-02 15:19:55,083 - ERROR - Problematic response text: {
+    "content": "<h1>CenterPoint Energy: A Leading Utility Provider</h1>
+<p>CenterPoint Energy, Inc. is a public utility holding company based in Houston, Texas. As one of the largest energy delivery companies in the United States, CenterPoint Energy operates through two main segments: Electric and Natural Gas. The company provides essential energy services to millions of customers across several states, ensuring reliable and efficient energy delivery.</p>
+
+<h2>Electric Segment: Powering Commun...
+2024-12-02 15:19:55,084 - INFO - Creating markdown content...
+2024-12-02 15:19:55,085 - INFO - Saving to MinIO...
+2024-12-02 15:19:55,513 - INFO - 
+Processing source: https://www.scotsmanguide.com/residential/mortgage-brokers-will-excel-with-the-cheap-debt-era-over/
+2024-12-02 15:19:55,513 - INFO - 
+Attempting to scrape: https://www.scotsmanguide.com/residential/mortgage-brokers-will-excel-with-the-cheap-debt-era-over/
+2024-12-02 15:19:57,265 - INFO - Retrieved HTML content length: 153070 characters
+2024-12-02 15:19:57,297 - INFO - SUCCESS: Successfully extracted content (6126 characters)
+2024-12-02 15:19:57,298 - INFO - SUCCESS: Successfully scraped content (6126 chars)
+2024-12-02 15:19:57,298 - INFO - 
+Content Statistics:
+2024-12-02 15:19:57,298 - INFO - Source 1: 6126 chars from www.scotsmanguide.com
+2024-12-02 15:19:57,299 - INFO - 
+Generating content using Claude...
+2024-12-02 15:20:11,478 - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2024-12-02 15:20:11,569 - ERROR - JSON parsing error: Invalid control character at: line 2 column 85 (char 86)
+2024-12-02 15:20:11,570 - ERROR - Problematic response text: {
+    "content": "<h1>Mortgage Brokers: Navigating the Changing Lending Landscape</h1>
+<p>The mortgage industry has witnessed a significant shift in recent years, bidding farewell to the era of ultra-low mortgage rates and steady loan volume. As interest rates soar and the lending landscape becomes more fragmented, the role of mortgage brokers has become increasingly crucial.</p>
+
+<h2>The Flexible Offerings of Mortgage Brokers</h2>
+<p>In today's dynamic lending environment, mortgage brokers offe...
+2024-12-02 15:20:11,571 - INFO - Creating markdown content...
+2024-12-02 15:20:11,572 - INFO - Saving to MinIO...
+2024-12-02 15:20:12,000 - INFO - 
+Processing source: https://finance.yahoo.com/news/cathie-wood-goes-bargain-hunting-153000032.html
+2024-12-02 15:20:12,000 - INFO - 
+Attempting to scrape: https://finance.yahoo.com/news/cathie-wood-goes-bargain-hunting-153000032.html
+2024-12-02 15:20:12,527 - ERROR - ERROR: Error scraping URL: 400, message='Got more than 8190 bytes (11355) when reading Header value is too long.', url='https://finance.yahoo.com/news/cathie-wood-goes-bargain-hunting-153000032.html'
+2024-12-02 15:20:12,527 - WARNING - WARNING: Failed to scrape content: 400, message='Got more than 8190 bytes (11355) when reading Header value is too long.', url='https://finance.yahoo.com/news/cathie-wood-goes-bargain-hunting-153000032.html'
+2024-12-02 15:20:12,528 - INFO - 
+Processing source: https://www.benzinga.com/24/11/42227834/cathie-wood-buys-amazon-amd-stock-trims-palantir-block-holdings-amid-ai-and-bitcoin-euphoria
+2024-12-02 15:20:12,529 - INFO - 
+Attempting to scrape: https://www.benzinga.com/24/11/42227834/cathie-wood-buys-amazon-amd-stock-trims-palantir-block-holdings-amid-ai-and-bitcoin-euphoria
+2024-12-02 15:20:12,797 - INFO - Retrieved HTML content length: 338161 characters
+2024-12-02 15:20:12,848 - INFO - SUCCESS: Successfully extracted content (3015 characters)
+2024-12-02 15:20:12,848 - INFO - SUCCESS: Successfully scraped content (3015 chars)
+2024-12-02 15:20:12,849 - INFO - 
+Processing source: https://www.investing.com/news/company-news/cathie-woods-ark-sells-roblox-stock-continues-trimming-tech-93CH-3747353
+2024-12-02 15:20:12,849 - INFO - 
+Attempting to scrape: https://www.investing.com/news/company-news/cathie-woods-ark-sells-roblox-stock-continues-trimming-tech-93CH-3747353
+2024-12-02 15:20:13,236 - INFO - Retrieved HTML content length: 880123 characters
+2024-12-02 15:20:13,409 - INFO - SUCCESS: Successfully extracted content (2281 characters)
+2024-12-02 15:20:13,410 - INFO - SUCCESS: Successfully scraped content (2281 chars)
+2024-12-02 15:20:13,411 - INFO - 
+Content Statistics:
+2024-12-02 15:20:13,411 - INFO - Source 1: 3015 chars from www.benzinga.com
+2024-12-02 15:20:13,411 - INFO - Source 2: 2281 chars from www.investing.com
+2024-12-02 15:20:13,412 - INFO - 
+Generating content using Claude...
+2024-12-02 15:20:30,098 - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2024-12-02 15:20:30,202 - INFO - Creating markdown content...
+2024-12-02 15:20:30,202 - INFO - Saving to MinIO...
+2024-12-02 15:20:30,629 - INFO - 
+Processing source: https://www.wlwt.com/article/cincinnati-residents-support-small-business-saturday/63058131
+2024-12-02 15:20:30,630 - INFO - 
+Attempting to scrape: https://www.wlwt.com/article/cincinnati-residents-support-small-business-saturday/63058131
+2024-12-02 15:20:30,934 - ERROR - ERROR: HTTP 451 error fetching URL
+2024-12-02 15:20:30,935 - WARNING - WARNING: Failed to scrape content: HTTP 451
+2024-12-02 15:20:30,935 - ERROR - ERROR: No content could be scraped from any source
+2024-12-02 15:20:30,936 - INFO - 
+Processing source: https://www.sfchronicle.com/california/article/california-homeowner-dropped-19914613.php
+2024-12-02 15:20:30,937 - INFO - 
+Attempting to scrape: https://www.sfchronicle.com/california/article/california-homeowner-dropped-19914613.php
+2024-12-02 15:20:31,301 - ERROR - ERROR: HTTP 403 error fetching URL
+2024-12-02 15:20:31,302 - WARNING - WARNING: Failed to scrape content: HTTP 403
+2024-12-02 15:20:31,302 - ERROR - ERROR: No content could be scraped from any source
+2024-12-02 15:20:31,303 - INFO - 
+Processing source: https://www.japantimes.co.jp/news/2024/12/01/japan/explainer/my-number-insurance-card-explainer/
+2024-12-02 15:20:31,303 - INFO - 
+Attempting to scrape: https://www.japantimes.co.jp/news/2024/12/01/japan/explainer/my-number-insurance-card-explainer/
+2024-12-02 15:20:34,082 - INFO - Retrieved HTML content length: 284157 characters
+2024-12-02 15:20:34,113 - INFO - SUCCESS: Successfully extracted content (467 characters)
+2024-12-02 15:20:34,113 - INFO - SUCCESS: Successfully scraped content (467 chars)
+2024-12-02 15:20:34,114 - INFO - 
+Content Statistics:
+2024-12-02 15:20:34,114 - INFO - Source 1: 467 chars from www.japantimes.co.jp
+2024-12-02 15:20:34,115 - INFO - 
+Generating content using Claude...
+2024-12-02 15:20:43,794 - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2024-12-02 15:20:43,852 - INFO - Creating markdown content...
+2024-12-02 15:20:43,852 - INFO - Saving to MinIO...
+2024-12-02 15:20:44,280 - INFO - 
+Processing source: https://www.potomaclocal.com/2024/11/29/insurance-scam-prince-william-residents-car-missing-tow-truck-driver-charged/
+2024-12-02 15:20:44,280 - INFO - 
+Attempting to scrape: https://www.potomaclocal.com/2024/11/29/insurance-scam-prince-william-residents-car-missing-tow-truck-driver-charged/
+2024-12-02 15:20:45,657 - INFO - Retrieved HTML content length: 117886 characters
+2024-12-02 15:20:45,693 - INFO - SUCCESS: Successfully extracted content (2512 characters)
+2024-12-02 15:20:45,694 - INFO - SUCCESS: Successfully scraped content (2512 chars)
+2024-12-02 15:20:45,694 - INFO - 
+Content Statistics:
+2024-12-02 15:20:45,694 - INFO - Source 1: 2512 chars from www.potomaclocal.com
+2024-12-02 15:20:45,694 - INFO - 
+Generating content using Claude...
+2024-12-02 15:20:56,987 - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2024-12-02 15:20:57,031 - INFO - Creating markdown content...
+2024-12-02 15:20:57,032 - INFO - Saving to MinIO...
+2024-12-02 15:20:57,480 - INFO - 
+Processing source: https://insideclimatenews.org/news/30112024/london-activists-target-insurance-industry-fossil-fuels/
+2024-12-02 15:20:57,481 - INFO - 
+Attempting to scrape: https://insideclimatenews.org/news/30112024/london-activists-target-insurance-industry-fossil-fuels/
+2024-12-02 15:20:57,887 - INFO - Retrieved HTML content length: 236605 characters
+2024-12-02 15:20:57,942 - INFO - SUCCESS: Successfully extracted content (22753 characters)
+2024-12-02 15:20:57,943 - INFO - SUCCESS: Successfully scraped content (22753 chars)
+2024-12-02 15:20:57,943 - INFO - 
+Content Statistics:
+2024-12-02 15:20:57,944 - INFO - Source 1: 22753 chars from insideclimatenews.org
+2024-12-02 15:20:57,944 - INFO - 
+Generating content using Claude...
+2024-12-02 15:21:12,048 - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2024-12-02 15:21:12,098 - ERROR - JSON parsing error: Expecting ',' delimiter: line 2 column 564 (char 565)
+2024-12-02 15:21:12,098 - ERROR - Problematic response text: {
+    "content": "<h1>To End the Fossil Fuel Era, Activists in London Target the Insurance Industry</h1>\n<p>As the climate crisis intensifies, activists in London are pressuring insurance companies to stop underwriting new oil, gas, and coal projects, seeing insurance as a critical lever to cut off financial support for the fossil fuel industry. In a week of creative protests, Extinction Rebellion UK marched through the city's financial district, donning wetsuits and life vests to symbolize the...
+2024-12-02 15:21:12,099 - INFO - Creating markdown content...
+2024-12-02 15:21:12,099 - INFO - Saving to MinIO...
