@@ -435,86 +435,92 @@ class ContentGenerator:
         return True
 
     def generate_content(self, sources: List[Dict], title: str) -> Dict:
-        source_texts = [f"Source {i+1} ({s['url']}):\n{s['content']}\n\n" 
-                       for i, s in enumerate(sources)]
-        
-        combined_sources = "\n".join(source_texts)
-        
-        prompt = f"""
-        Write a comprehensive, SEO-optimized article that synthesizes information from the provided sources.
+        """Generate article content using Claude"""
+        try:
+            source_texts = [f"Source {i+1} ({s['url']}):\n{s['content']}\n\n" 
+                        for i, s in enumerate(sources)]
+            
+            combined_sources = "\n".join(source_texts)
+            
+            prompt = f"""You are a professional content writer. Write a comprehensive article that synthesizes information from the provided sources.
 
-        Requirements:
-        1. Structure:
-            - Start with an engaging introduction (2-3 paragraphs)
-            - Include 4-5 H2 subheadings for main sections
-            - Each section must have 2-3 paragraphs minimum
-            - Use proper HTML tags: <h1>, <h2>, <p> for all content
-            - Total length MUST be between 800-1500 words
-        
-        2. Writing Style:
-            - Write for a 9th-grade reading level
-            - Use short, clear sentences
-            - Each paragraph should be 2-4 sentences
-            - Include relevant statistics and data from sources
-        
-        3. SEO Optimization:
-            - Include LSI keywords naturally
-            - Use descriptive subheadings
-            - Ensure proper heading hierarchy
-            - Include transition sentences between sections
+Return ONLY a valid JSON object with this exact structure (no additional text or formatting):
+{{
+    "content": "<h1>{title}</h1>\\n<p>Introduction paragraph...</p>\\n<h2>First Section</h2>\\n<p>Content...</p>",
+    "excerpt": "Brief 1-2 sentence summary",
+    "metaTitle": "{title}",
+    "metaDescription": "Learn about {title}",
+    "tags": ["tag1", "tag2"],
+    "suggestedFeatures": {{
+        "hasVideo": false,
+        "hasAudio": false,
+        "hasGallery": false
+    }}
+}}
 
-        Title: {title}
+Sources to synthesize:
+{combined_sources}
 
-        Sources:
-        {combined_sources}
+Requirements:
+1. Content must be 800-1500 words
+2. Use proper HTML tags (<h1>, <h2>, <p>)
+3. Write in a clear, engaging style
+4. Include 3-4 main sections with H2 headings
+5. Return ONLY the JSON object - no other text or formatting"""
 
-        Return ONLY a JSON object in this exact format:
-        {{
-            "content": "Your full HTML-formatted article content with proper tags",
-            "excerpt": "Compelling 2-3 sentence summary (max 550 chars)",
-            "metaTitle": "SEO-optimized title (max 70 chars)",
-            "metaDescription": "SEO-optimized description (max 150 chars)",
-            "tags": ["tag1", "tag2", "tag3"],
-            "suggestedFeatures": {{
-                "hasVideo": false,
-                "hasAudio": false,
-                "hasGallery": false
-            }}
-        }}
-
-        The content MUST use proper HTML tags and be between 800-1500 words. Do not include any markdown formatting - use HTML tags instead.
-        """
-
-        response = self.anthropic.messages.create(
-            model="claude-3-sonnet-20240229",
-            max_tokens=4000,
-            temperature=0.7,
-            messages=[{"role": "user", "content": prompt}]
-        )
-        
-        response_text = response.content[0].text.strip()
-        if "```json" in response_text:
-            response_text = response_text.split("```json")[1].split("```")[0].strip()
-        elif "```" in response_text:
-            response_text = response_text.split("```")[1].strip()
-        
-        response_text = re.sub(r'[\x00-\x1F\x7F-\x9F]', '', response_text)
-        
-        return json.loads(response_text)
+            response = self.anthropic.messages.create(
+                model="claude-3-sonnet-20240229",
+                max_tokens=4000,
+                temperature=0.7,
+                messages=[{"role": "user", "content": prompt}]
+            )
+            
+            response_text = response.content[0].text.strip()
+            
+            # Clean up the response text
+            if "```json" in response_text:
+                response_text = response_text.split("```json")[1].split("```")[0].strip()
+            elif "```" in response_text:
+                response_text = response_text.split("```")[1].strip()
+            
+            # Remove any potential leading/trailing characters
+            response_text = re.sub(r'^[^{]*', '', response_text)
+            response_text = re.sub(r'[^}]*$', '', response_text)
+            
+            try:
+                # Log the cleaned response for debugging
+                logging.debug(f"Cleaned response text: {response_text[:500]}...")
+                
+                result = json.loads(response_text)
+                
+                # Validate the required fields
+                required_fields = ["content", "excerpt", "metaTitle", "metaDescription", "tags", "suggestedFeatures"]
+                missing_fields = [field for field in required_fields if field not in result]
+                
+                if missing_fields:
+                    logging.error(f"Missing required fields in response: {missing_fields}")
+                    return self._generate_fallback_content(title)
+                    
+                return result
+                
+            except json.JSONDecodeError as e:
+                logging.error(f"JSON parsing error: {str(e)}")
+                logging.error(f"Problematic response text: {response_text[:500]}...")
+                return self._generate_fallback_content(title)
+                
+        except Exception as e:
+            logging.error(f"Error in content generation: {str(e)}")
+            return self._generate_fallback_content(title)
 
     def _generate_fallback_content(self, title: str) -> Dict:
-        """Generate fallback content when all attempts fail"""
+        """Generate fallback content when main generation fails"""
         return {
-            "content": f"<h1>{title}</h1>\n<p>Content generation failed after multiple attempts. Please try again.</p>",
+            "content": f"<h1>{title}</h1>\n<p>Content generation failed. Please try again.</p>",
             "excerpt": f"Article about {title}",
             "metaTitle": title[:70],
             "metaDescription": f"Learn about {title}",
             "tags": [],
-            "suggestedFeatures": {
-                "hasVideo": False,
-                "hasAudio": False,
-                "hasGallery": False
-            }
+            "suggestedFeatures": {"hasVideo": False, "hasAudio": False, "hasGallery": False}
         }
 
     def create_article_markdown(self, content_data: Dict, article_data: Dict) -> str:
@@ -845,21 +851,15 @@ class ArticleProcessor(GoogleSheetsManager):
             for idx, source in enumerate(source_contents, 1):
                 logging.info(f"Source {idx}: {len(source['content'])} chars from {source['domain']}")
 
+        try:
             # Generate content
             logging.info("\nGenerating content using Claude...")
             content_data = self.content_generator.generate_content(source_contents, article_data["title"])
             
-            if not content_data:
-                raise Exception("Failed to generate content")
-
             # Create markdown
             logging.info("Creating markdown content...")
-            try:
-                markdown_content = self.content_generator.create_article_markdown(content_data, article_data)
-            except Exception as e:
-                logging.error(f"Error creating markdown: {str(e)}")
-                raise
-
+            markdown_content = self.content_generator.create_article_markdown(content_data, article_data)
+            
             # Save to MinIO
             logging.info("Saving to MinIO...")
             storage_url = await self.content_generator.save_to_minio(markdown_content, article_data["slug"])
@@ -874,11 +874,13 @@ class ArticleProcessor(GoogleSheetsManager):
                 "tags": content_data.get("tags", [])
             })
             
+            logging.info(f"SUCCESS: Successfully saved to: {storage_url}")
             return article_data
             
         except Exception as e:
-            logging.error(f"Error processing article: {str(e)}")
-            article_data["error"] = str(e)
+            logging.error(f"ERROR: Error in content generation: {str(e)}")
+            logging.error(f"Full error: {e.__class__.__name__}: {str(e)}")
+            article_data["error"] = f"Content generation failed: {str(e)}"
             return article_data
 
 async def main():
