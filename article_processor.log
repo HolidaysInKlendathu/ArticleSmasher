@@ -184,3 +184,41 @@ Generating content using Claude...
     "content": "<h1>To End the Fossil Fuel Era, Activists in London Target the Insurance Industry</h1>\n<p>As the climate crisis intensifies, activists in London are pressuring insurance companies to stop underwriting new oil, gas, and coal projects, seeing insurance as a critical lever to cut off financial support for the fossil fuel industry. In a week of creative protests, Extinction Rebellion UK marched through the city's financial district, donning wetsuits and life vests to symbolize the...
 2024-12-02 15:21:12,099 - INFO - Creating markdown content...
 2024-12-02 15:21:12,099 - INFO - Saving to MinIO...
+2024-12-02 15:38:19,862 - INFO - file_cache is only supported with oauth2client<4.0.0
+2024-12-02 15:38:22,561 - INFO - 
+Processing source: https://www.foley.com/insights/publications/2024/08/employers-new-health-welfare-employee-benefit-notice/
+2024-12-02 15:38:22,562 - INFO - 
+Attempting to scrape: https://www.foley.com/insights/publications/2024/08/employers-new-health-welfare-employee-benefit-notice/
+2024-12-02 15:38:23,020 - INFO - Retrieved HTML content length: 50699 characters
+2024-12-02 15:38:23,041 - INFO - SUCCESS: Successfully extracted content (2092 characters)
+2024-12-02 15:38:23,042 - INFO - SUCCESS: Successfully scraped content (2092 chars)
+2024-12-02 15:38:23,042 - INFO - 
+Content Statistics:
+2024-12-02 15:38:23,042 - INFO - Source 1: 2092 chars from www.foley.com
+2024-12-02 15:38:23,043 - INFO - 
+Generating content using Claude...
+2024-12-02 15:38:37,021 - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2024-12-02 15:38:37,118 - INFO - Creating markdown content...
+2024-12-02 15:38:37,119 - INFO - Saving to MinIO...
+2024-12-02 15:38:38,832 - INFO - 
+Processing source: https://www.benefitspro.com/2024/11/27/trumps-health-benefits-team-picks-the-early-reviews/?slreturn=20241202113709
+2024-12-02 15:38:38,832 - INFO - 
+Attempting to scrape: https://www.benefitspro.com/2024/11/27/trumps-health-benefits-team-picks-the-early-reviews/?slreturn=20241202113709
+2024-12-02 15:38:41,272 - INFO - Retrieved HTML content length: 214555 characters
+2024-12-02 15:38:41,314 - INFO - SUCCESS: Successfully extracted content (1018 characters)
+2024-12-02 15:38:41,315 - INFO - SUCCESS: Successfully scraped content (1018 chars)
+2024-12-02 15:38:41,315 - INFO - 
+Content Statistics:
+2024-12-02 15:38:41,315 - INFO - Source 1: 1018 chars from www.benefitspro.com
+2024-12-02 15:38:41,316 - INFO - 
+Generating content using Claude...
+2024-12-02 15:38:51,653 - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2024-12-02 15:38:51,696 - ERROR - JSON parsing error: Invalid control character at: line 2 column 79 (char 80)
+2024-12-02 15:38:51,697 - ERROR - Problematic response text: {
+    "content": "<h1>Trump's Health Benefits Team Picks: The Early Reviews</h1>
+    <p>President-elect Donald Trump's initial selections for key positions in his administration have sparked a range of reactions from industry experts and stakeholders. With the potential to influence various aspects of employer-sponsored health plans, these appointments are being closely scrutinized for their potential impact on the healthcare landscape.</p>
+
+    <h2>Reshaping the Healthcare Landscape</h2>
+    <p...
+2024-12-02 15:38:51,698 - INFO - Creating markdown content...
+2024-12-02 15:38:51,698 - INFO - Saving to MinIO...

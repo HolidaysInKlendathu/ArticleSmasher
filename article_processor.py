@@ -75,142 +75,57 @@ class DatabaseHandler:
                     if existing_article:
                         # Update existing article
                         sql = """
-                        UPDATE Article 
-                        SET 
-                            title = %s,
-                            content = %s,
-                            markdownUrl = %s,
-                            excerpt = %s,
-                            coverImage = %s,
-                            readingTime = %s,
-                            wordCount = %s,
-                            status = %s,
-                            metaTitle = %s,
-                            metaDescription = %s,
-                            featured = %s,
-                            spotlight = %s,
-                            evergreen = %s,
-                            sponsored = %s,
-                            sponsorName = %s,
-                            partnerContent = %s,
-                            affiliate = %s,
-                            crowdsourced = %s,
-                            premium = %s,
-                            hasVideo = %s,
-                            hasAudio = %s,
-                            hasGallery = %s,
-                            updatedAt = NOW()
-                        WHERE slug = %s
+                            UPDATE Article 
+                            SET title = %s, content = %s, excerpt = %s, 
+                                metaTitle = %s, metaDescription = %s,
+                                category = %s, subCategory = %s,
+                                storage_url = %s, updatedAt = NOW()
+                            WHERE slug = %s
                         """
                         cursor.execute(sql, (
                             article_data["title"],
                             article_data["content"],
-                            article_data["markdownUrl"],
-                            article_data["excerpt"],
-                            article_data["coverImage"],
-                            article_data["readingTime"],
-                            article_data["wordCount"],
-                            article_data["status"],
-                            article_data["metaTitle"],
-                            article_data["metaDescription"],
-                            article_data["featured"],
-                            article_data["spotlight"],
-                            article_data["evergreen"],
-                            article_data["sponsored"],
-                            article_data.get("sponsorName", ""),
-                            article_data["partnerContent"],
-                            article_data["affiliate"],
-                            article_data["crowdsourced"],
-                            article_data["premium"],
-                            article_data["hasVideo"],
-                            article_data["hasAudio"],
-                            article_data["hasGallery"],
+                            article_data.get("excerpt", ""),
+                            article_data.get("metaTitle", article_data["title"][:70]),
+                            article_data.get("metaDescription", ""),
+                            article_data["primary_category"]["slug"],
+                            article_data["primary_category"]["subcategory"]["slug"],
+                            article_data.get("storage_url", ""),
                             article_data["slug"]
                         ))
                     else:
                         # Create new article
                         sql = """
-                        INSERT INTO Article (
-                            id, title, slug, content, markdownUrl, excerpt, coverImage,
-                            readingTime, wordCount, publishedAt, updatedAt, status,
-                            viewCount, metaTitle, metaDescription, 
-                            featured, spotlight, evergreen, sponsored, sponsorName,
-                            partnerContent, affiliate, crowdsourced, premium,
-                            hasVideo, hasAudio, hasGallery, authorId
-                        ) VALUES (
-                            %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW(), %s,
-                            0, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-                            %s, %s, %s, %s
-                        )
+                            INSERT INTO Article (
+                                id, title, slug, content, excerpt,
+                                metaTitle, metaDescription,
+                                category, subCategory,
+                                storage_url, createdAt, updatedAt
+                            ) VALUES (
+                                %s, %s, %s, %s, %s,
+                                %s, %s, %s, %s,
+                                %s, NOW(), NOW()
+                            )
                         """
                         cursor.execute(sql, (
                             new_id,
                             article_data["title"],
                             article_data["slug"],
                             article_data["content"],
-                            article_data["markdownUrl"],
-                            article_data["excerpt"],
-                            article_data["coverImage"],
-                            article_data["readingTime"],
-                            article_data["wordCount"],
-                            "PUBLISHED",
-                            article_data["metaTitle"],
-                            article_data["metaDescription"],
-                            article_data["featured"],
-                            article_data["spotlight"],
-                            article_data["evergreen"],
-                            article_data["sponsored"],
-                            article_data.get("sponsorName", ""),
-                            article_data["partnerContent"],
-                            article_data["affiliate"],
-                            article_data["crowdsourced"],
-                            article_data["premium"],
-                            article_data["hasVideo"],
-                            article_data["hasAudio"],
-                            article_data["hasGallery"],
-                            article_data["authorId"]
+                            article_data.get("excerpt", ""),
+                            article_data.get("metaTitle", article_data["title"][:70]),
+                            article_data.get("metaDescription", ""),
+                            article_data["primary_category"]["slug"],
+                            article_data["primary_category"]["subcategory"]["slug"],
+                            article_data.get("storage_url", "")
                         ))
 
-                    # After creating/updating the article, handle categories
-                    if article_data.get("categories"):
-                        # First, ensure categories exist
-                        for category_slug in article_data["categories"]:
-                            # Check if category exists
-                            cursor.execute(
-                                "SELECT id FROM Category WHERE slug = %s",
-                                (category_slug,)
-                            )
-                            category = cursor.fetchone()
-                            
-                            if not category:
-                                # Create category if it doesn't exist
-                                category_id = str(uuid.uuid4())  # Generate a UUID for the category
-                                cursor.execute(
-                                    "INSERT INTO Category (id, name, slug) VALUES (%s, %s, %s)",
-                                    (category_id, category_slug.title(), category_slug)
-                                )
-                                category = (category_id,)
-
-                            # Create category-article relationship
-                            cursor.execute("""
-                                INSERT INTO _ArticleToCategory (A, B)
-                                VALUES (%s, %s)
-                                ON DUPLICATE KEY UPDATE A = VALUES(A)
-                            """, (
-                                existing_article[0] if existing_article else new_id,
-                                category[0]
-                            ))
-
                     connection.commit()
-                    print(f"Successfully created/updated article with ID: {new_id if not existing_article else existing_article[0]}")
                     return True
-                    
-        except Exception as e:
-            print(f"Database error creating/updating article: {e}")
-            print("Article data:", article_data)
-            raise
 
-        return False
+        except Exception as e:
+            logging.error(f"Database error: {str(e)}")
+            return False
 
 class ArticleScraper:
     def __init__(self):
@@ -825,7 +740,9 @@ class ArticleProcessor(GoogleSheetsManager):
                 }
             }
         
-        source_contents = []  # Initialize source_contents here
+        # Initialize database handler
+        db_handler = DatabaseHandler(os.getenv("DATABASE_URL"))
+        source_contents = []
         
         try:
             # Scrape all source URLs
@@ -868,6 +785,14 @@ class ArticleProcessor(GoogleSheetsManager):
                 "metaDescription": content_data.get("metaDescription", ""),
                 "tags": content_data.get("tags", [])
             })
+            
+            # Save to database
+            logging.info("Saving to database...")
+            if db_handler.create_or_update_article(article_data):
+                logging.info("SUCCESS: Article saved to database")
+            else:
+                logging.error("ERROR: Failed to save article to database")
+                article_data["error"] = "Failed to save to database"
             
             return article_data
             
