@@ -476,6 +476,7 @@ Requirements:
             )
             
             response_text = response.content[0].text.strip()
+            logging.debug(f"Raw response from Claude: {response_text[:500]}...")
             
             # Clean up the response text
             if "```json" in response_text:
