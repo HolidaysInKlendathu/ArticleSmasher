@@ -836,22 +836,33 @@ class ArticleProcessor(GoogleSheetsManager):
             
             # Create markdown
             logging.info("Creating markdown content...")
-            markdown_content = self.content_generator.create_article_markdown(content_data, result)
+            markdown_content = self.content_generator.create_article_markdown(content_data, article_data)
             
             # Save to MinIO
             logging.info("Saving to MinIO...")
-            storage_url = await self.content_generator.save_to_minio(markdown_content, result["slug"])
+            storage_url = await self.content_generator.save_to_minio(markdown_content, article_data["slug"])
+            
+            # Add results to return dictionary
+            article_data.update({
+                "content": content_data["content"],
+                "storage_url": storage_url,
+                "excerpt": content_data.get("excerpt", ""),
+                "metaTitle": content_data.get("metaTitle", article_data["title"][:70]),
+                "metaDescription": content_data.get("metaDescription", ""),
+                "tags": content_data.get("tags", [])
+            })
             
             logging.info(f"SUCCESS: Successfully saved to: {storage_url}")
+            return article_data
             
         except Exception as e:
             logging.error(f"ERROR: Error in content generation: {str(e)}")
             logging.error(f"Full error: {e.__class__.__name__}: {str(e)}")
-            result["error"] = f"Content generation failed: {str(e)}"
-
-        return result
+            article_data["error"] = f"Content generation failed: {str(e)}"
+            return article_data
 
 async def main():
+    processor = None
     try:
         processor = ArticleProcessor()
         
@@ -870,7 +881,7 @@ async def main():
                 continue
             
             print(f"Primary Category: {result['primary_category']['name']} / {result['primary_category']['subcategory']['name']}")
-            if result['additional_categories']:
+            if result.get('additional_categories'):
                 print("Additional Categories:")
                 for cat in result['additional_categories']:
                     print(f"  - {cat['name']} / {cat['subcategory']['name']} (Score: {cat['score']:.2f})")
@@ -879,15 +890,15 @@ async def main():
                 print(f"Saved to: {result['storage_url']}")
             print("---")
         
-        # Close sessions
-        await processor.scraper.close_session()
-        
         print("\nProcessing complete!")
         print(f"Successfully processed {len([r for r in results if 'error' not in r])} articles")
         print(f"Failed to process {len([r for r in results if 'error' in r])} articles")
         
     except Exception as e:
         print(f"Error in main: {str(e)}")
+    finally:
+        if processor and processor.scraper:
+            await processor.scraper.close_session()
 
 if __name__ == "__main__":
     asyncio.run(main())
