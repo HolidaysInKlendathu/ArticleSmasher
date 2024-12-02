@@ -76,10 +76,15 @@ class DatabaseHandler:
                         # Update existing article
                         sql = """
                             UPDATE Article 
-                            SET title = %s, content = %s, excerpt = %s, 
-                                metaTitle = %s, metaDescription = %s,
-                                primaryCategory = %s, primarySubcategory = %s,
-                                storageUrl = %s, updatedAt = NOW()
+                            SET title = %s, 
+                                content = %s, 
+                                excerpt = %s, 
+                                metaTitle = %s, 
+                                metaDescription = %s,
+                                categoryId = %s,
+                                subcategoryId = %s,
+                                url = %s, 
+                                updatedAt = NOW()
                             WHERE slug = %s
                         """
                         cursor.execute(sql, (
@@ -99,8 +104,8 @@ class DatabaseHandler:
                             INSERT INTO Article (
                                 id, title, slug, content, excerpt,
                                 metaTitle, metaDescription,
-                                primaryCategory, primarySubcategory,
-                                storageUrl, createdAt, updatedAt
+                                categoryId, subcategoryId,
+                                url, createdAt, updatedAt
                             ) VALUES (
                                 %s, %s, %s, %s, %s,
                                 %s, %s, %s, %s,

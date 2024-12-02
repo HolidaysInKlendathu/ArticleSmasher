@@ -263,3 +263,73 @@ Generating content using Claude...
 2024-12-02 15:45:35,055 - INFO - Saving to database...
 2024-12-02 15:45:36,561 - ERROR - Database error: (1054, "Unknown column 'category' in 'INSERT INTO'")
 2024-12-02 15:45:36,561 - ERROR - ERROR: Failed to save article to database
+2024-12-02 15:50:12,037 - INFO - file_cache is only supported with oauth2client<4.0.0
+2024-12-02 15:50:15,025 - INFO - 
+Processing source: https://www.foley.com/insights/publications/2024/08/employers-new-health-welfare-employee-benefit-notice/
+2024-12-02 15:50:15,025 - INFO - 
+Attempting to scrape: https://www.foley.com/insights/publications/2024/08/employers-new-health-welfare-employee-benefit-notice/
+2024-12-02 15:50:15,276 - INFO - Retrieved HTML content length: 50551 characters
+2024-12-02 15:50:15,307 - INFO - SUCCESS: Successfully extracted content (2092 characters)
+2024-12-02 15:50:15,308 - INFO - SUCCESS: Successfully scraped content (2092 chars)
+2024-12-02 15:50:15,308 - INFO - 
+Content Statistics:
+2024-12-02 15:50:15,309 - INFO - Source 1: 2092 chars from www.foley.com
+2024-12-02 15:50:15,309 - INFO - 
+Generating content using Claude...
+2024-12-02 15:50:26,991 - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2024-12-02 15:50:27,064 - INFO - Creating markdown content...
+2024-12-02 15:50:27,064 - INFO - Saving to MinIO...
+2024-12-02 15:50:28,608 - INFO - Saving to database...
+2024-12-02 15:50:30,129 - ERROR - Database error: (1054, "Unknown column 'primaryCategory' in 'INSERT INTO'")
+2024-12-02 15:50:30,129 - ERROR - SQL Query: 
+                            INSERT INTO Article (
+                                id, title, slug, content, excerpt,
+                                metaTitle, metaDescription,
+                                primaryCategory, primarySubcategory,
+                                storageUrl, createdAt, updatedAt
+                            ) VALUES (
+                                %s, %s, %s, %s, %s,
+                                %s, %s, %s, %s,
+                                %s, NOW(), NOW()
+                            )
+                        
+2024-12-02 15:50:30,131 - ERROR - Values: {'row': 2, 'title': 'Employers Required to Provide New Health and Welfare Employee Benefit Notice', 'slug': 'employers-required-to-provide-new-health-and-welfare-employee-benefit-notice', 'final_url': 'https://riskbagel.com/articles/employers-required-to-provide-new-health-and-welfare-employee-benefit-notice', 'source_urls': [{'column': 'B', 'url': 'https://www.foley.com/insights/publications/2024/08/employers-new-health-welfare-employee-benefit-notice/'}], 'primary_category': {'name': 'Uncategorized', 'slug': 'uncategorized', 'subcategory': {'name': 'General', 'slug': 'general'}}, 'content': '<h1>Employers Required to Provide New Health and Welfare Employee Benefit Notice</h1>\n<p>As healthcare costs continue to rise, employers are seeking innovative ways to provide affordable benefits to their employees. One such option is offering hospital indemnity or other fixed indemnity insurance benefits. However, new regulations have been introduced that require employers to provide specific notice of these benefits to all employees, starting with plan years on or after January 1, 2025.</p>\n<h2>Understanding Fixed Indemnity Insurance</h2>\n<p>Fixed indemnity insurance products are designed to pay a pre-determined amount for covered medical services, regardless of the actual costs incurred. Unlike traditional health insurance, these plans do not vary their payments based on the total bill or services provided. Instead, they offer a fixed payment per occurrence of a covered event. These products are marketed under various names, but their defining feature is this fixed payment structure.</p>\n<h2>The Need for Transparency</h2>\n<p>While fixed indemnity insurance can provide some financial protection, there is a risk that employees may mistakenly purchase these plans as an alternative or replacement for comprehensive health insurance coverage. To address this concern, the new regulations mandate that employers provide a clear notice highlighting the differences between fixed indemnity products and traditional health insurance coverage. This notice must be prominently displayed on the first page of any marketing, application, and enrollment materials in at least 14-point font.</p>\n<h2>Compliance and Implementation</h2>\n<p>Both employers and the insurance companies issuing fixed indemnity products are responsible for providing the new notice to all employees. Employers are advised to confer with their insurance providers to ensure compliance with this requirement. Failure to provide the mandated notice could result in penalties and legal consequences. To streamline the process and avoid overwhelming employees with excessive legal notices, it is recommended to seek guidance from experienced legal professionals who can assist in crafting the notice in a clear and concise manner.</p>\n<h2>Looking Ahead</h2>\n<p>As the healthcare landscape continues to evolve, employers must remain vigilant in ensuring compliance with new regulations while providing valuable benefits to their workforce. By adhering to the new notice requirements, employers can promote transparency and empower employees to make informed decisions regarding their healthcare coverage. Additionally, seeking expert guidance can help navigate the complexities of these regulations and ensure a seamless implementation process.</p>', 'storage_url': 'https://minio-zok40c4wo8s88cks0cwc0kkk.newslettermonster.com/bagelarticles/articles/employers-required-to-provide-new-health-and-welfare-employee-benefit-notice.md', 'excerpt': 'New regulations require employers offering hospital indemnity or fixed indemnity insurance benefits to provide a specific notice to employees, highlighting the differences between these products and traditional health insurance.', 'metaTitle': 'Employers Required to Provide New Health and Welfare Employee Benefit Notice', 'metaDescription': 'Learn about the new regulations requiring employers to provide a notice to employees regarding hospital indemnity and fixed indemnity insurance benefits.', 'tags': ['employee benefits', 'health insurance', 'regulations', 'compliance']}
+2024-12-02 15:50:30,134 - ERROR - ERROR: Failed to save article to database
+2024-12-02 15:50:30,136 - INFO - 
+Processing source: https://www.benefitspro.com/2024/11/27/trumps-health-benefits-team-picks-the-early-reviews/?slreturn=20241202113709
+2024-12-02 15:50:30,136 - INFO - 
+Attempting to scrape: https://www.benefitspro.com/2024/11/27/trumps-health-benefits-team-picks-the-early-reviews/?slreturn=20241202113709
+2024-12-02 15:50:32,218 - INFO - Retrieved HTML content length: 214616 characters
+2024-12-02 15:50:32,263 - INFO - SUCCESS: Successfully extracted content (1018 characters)
+2024-12-02 15:50:32,264 - INFO - SUCCESS: Successfully scraped content (1018 chars)
+2024-12-02 15:50:32,264 - INFO - 
+Content Statistics:
+2024-12-02 15:50:32,265 - INFO - Source 1: 1018 chars from www.benefitspro.com
+2024-12-02 15:50:32,265 - INFO - 
+Generating content using Claude...
+2024-12-02 15:50:44,522 - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2024-12-02 15:50:44,588 - ERROR - JSON parsing error: Invalid control character at: line 2 column 79 (char 80)
+2024-12-02 15:50:44,589 - ERROR - Problematic response text: {
+    "content": "<h1>Trump's Health Benefits Team Picks: The Early Reviews</h1>
+<p>As President-elect Donald Trump prepares to take office, his administration's early picks for key positions related to health benefits are garnering attention and analysis from industry experts. These selections could potentially shape the future of employer-sponsored health plans, provider networks, and insurance offerings.</p>
+
+<h2>Impacting Provider Networks and Mental Health Coverage</h2>
+<p>One of Trump's pi...
+2024-12-02 15:50:44,590 - INFO - Creating markdown content...
+2024-12-02 15:50:44,590 - INFO - Saving to MinIO...
+2024-12-02 15:50:45,024 - INFO - Saving to database...
+2024-12-02 15:50:46,488 - ERROR - Database error: (1054, "Unknown column 'primaryCategory' in 'INSERT INTO'")
+2024-12-02 15:50:46,489 - ERROR - SQL Query: 
+                            INSERT INTO Article (
+                                id, title, slug, content, excerpt,
+                                metaTitle, metaDescription,
+                                primaryCategory, primarySubcategory,
+                                storageUrl, createdAt, updatedAt
+                            ) VALUES (
+                                %s, %s, %s, %s, %s,
+                                %s, %s, %s, %s,
+                                %s, NOW(), NOW()
+                            )
+                        
+2024-12-02 15:50:46,490 - ERROR - Values: {'row': 3, 'title': "Trump's health benefits team picks: The early reviews", 'slug': 'trump-s-health-benefits-team-picks-the-early-reviews', 'final_url': 'https://riskbagel.com/articles/trump-s-health-benefits-team-picks-the-early-reviews', 'source_urls': [{'column': 'B', 'url': 'https://www.benefitspro.com/2024/11/27/trumps-health-benefits-team-picks-the-early-reviews/?slreturn=20241202113709'}], 'primary_category': {'name': 'Uncategorized', 'slug': 'uncategorized', 'subcategory': {'name': 'General', 'slug': 'general'}}, 'content': "<h1>Trump's health benefits team picks: The early reviews</h1>\n<p>Content generation failed. Please try again.</p>", 'storage_url': 'https://minio-zok40c4wo8s88cks0cwc0kkk.newslettermonster.com/bagelarticles/articles/trump-s-health-benefits-team-picks-the-early-reviews.md', 'excerpt': "Article about Trump's health benefits team picks: The early reviews", 'metaTitle': "Trump's health benefits team picks: The early reviews", 'metaDescription': "Learn about Trump's health benefits team picks: The early reviews", 'tags': []}
+2024-12-02 15:50:46,491 - ERROR - ERROR: Failed to save article to database
