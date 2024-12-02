@@ -78,8 +78,8 @@ class DatabaseHandler:
                             UPDATE Article 
                             SET title = %s, content = %s, excerpt = %s, 
                                 metaTitle = %s, metaDescription = %s,
-                                category = %s, subCategory = %s,
-                                storage_url = %s, updatedAt = NOW()
+                                primaryCategory = %s, primarySubcategory = %s,
+                                storageUrl = %s, updatedAt = NOW()
                             WHERE slug = %s
                         """
                         cursor.execute(sql, (
@@ -99,8 +99,8 @@ class DatabaseHandler:
                             INSERT INTO Article (
                                 id, title, slug, content, excerpt,
                                 metaTitle, metaDescription,
-                                category, subCategory,
-                                storage_url, createdAt, updatedAt
+                                primaryCategory, primarySubcategory,
+                                storageUrl, createdAt, updatedAt
                             ) VALUES (
                                 %s, %s, %s, %s, %s,
                                 %s, %s, %s, %s,
@@ -121,10 +121,13 @@ class DatabaseHandler:
                         ))
 
                     connection.commit()
+                    logging.info(f"Successfully {'updated' if existing_article else 'created'} article with id: {existing_article[0] if existing_article else new_id}")
                     return True
 
         except Exception as e:
             logging.error(f"Database error: {str(e)}")
+            logging.error(f"SQL Query: {sql}")
+            logging.error(f"Values: {article_data}")
             return False
 
 class ArticleScraper:

@@ -222,3 +222,44 @@ Generating content using Claude...
     <p...
 2024-12-02 15:38:51,698 - INFO - Creating markdown content...
 2024-12-02 15:38:51,698 - INFO - Saving to MinIO...
+2024-12-02 15:45:00,479 - INFO - file_cache is only supported with oauth2client<4.0.0
+2024-12-02 15:45:03,174 - INFO - 
+Processing source: https://www.foley.com/insights/publications/2024/08/employers-new-health-welfare-employee-benefit-notice/
+2024-12-02 15:45:03,174 - INFO - 
+Attempting to scrape: https://www.foley.com/insights/publications/2024/08/employers-new-health-welfare-employee-benefit-notice/
+2024-12-02 15:45:03,420 - INFO - Retrieved HTML content length: 50699 characters
+2024-12-02 15:45:03,442 - INFO - SUCCESS: Successfully extracted content (2092 characters)
+2024-12-02 15:45:03,442 - INFO - SUCCESS: Successfully scraped content (2092 chars)
+2024-12-02 15:45:03,442 - INFO - 
+Content Statistics:
+2024-12-02 15:45:03,443 - INFO - Source 1: 2092 chars from www.foley.com
+2024-12-02 15:45:03,443 - INFO - 
+Generating content using Claude...
+2024-12-02 15:45:12,750 - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2024-12-02 15:45:12,798 - INFO - Creating markdown content...
+2024-12-02 15:45:12,799 - INFO - Saving to MinIO...
+2024-12-02 15:45:15,043 - INFO - Saving to database...
+2024-12-02 15:45:16,524 - ERROR - Database error: (1054, "Unknown column 'category' in 'INSERT INTO'")
+2024-12-02 15:45:16,525 - ERROR - ERROR: Failed to save article to database
+2024-12-02 15:45:16,526 - INFO - 
+Processing source: https://www.benefitspro.com/2024/11/27/trumps-health-benefits-team-picks-the-early-reviews/?slreturn=20241202113709
+2024-12-02 15:45:16,527 - INFO - 
+Attempting to scrape: https://www.benefitspro.com/2024/11/27/trumps-health-benefits-team-picks-the-early-reviews/?slreturn=20241202113709
+2024-12-02 15:45:18,738 - INFO - Retrieved HTML content length: 214522 characters
+2024-12-02 15:45:18,785 - INFO - SUCCESS: Successfully extracted content (1018 characters)
+2024-12-02 15:45:18,785 - INFO - SUCCESS: Successfully scraped content (1018 chars)
+2024-12-02 15:45:18,786 - INFO - 
+Content Statistics:
+2024-12-02 15:45:18,787 - INFO - Source 1: 1018 chars from www.benefitspro.com
+2024-12-02 15:45:18,787 - INFO - 
+Generating content using Claude...
+2024-12-02 15:45:34,526 - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2024-12-02 15:45:34,623 - ERROR - JSON parsing error: Invalid control character at: line 2 column 79 (char 80)
+2024-12-02 15:45:34,623 - ERROR - Problematic response text: {
+    "content": "<h1>Trump's Health Benefits Team Picks: The Early Reviews</h1>
+<p>With the new administration taking shape, President-elect Donald Trump's early picks for key positions that could impact the healthcare and employee benefits landscape are garnering attention and analysis from industry experts. From potential changes to provider networks and insurance offerings to broader policy shifts, these appointments have the potential to shape the future of healthcare and benefits for milli...
+2024-12-02 15:45:34,625 - INFO - Creating markdown content...
+2024-12-02 15:45:34,625 - INFO - Saving to MinIO...
+2024-12-02 15:45:35,055 - INFO - Saving to database...
+2024-12-02 15:45:36,561 - ERROR - Database error: (1054, "Unknown column 'category' in 'INSERT INTO'")
+2024-12-02 15:45:36,561 - ERROR - ERROR: Failed to save article to database
