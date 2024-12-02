@@ -825,7 +825,28 @@ class ArticleProcessor(GoogleSheetsManager):
                 }
             }
         
+        source_contents = []  # Initialize source_contents here
+        
         try:
+            # Scrape all source URLs
+            for source in article_data["source_urls"]:
+                logging.info(f"\nProcessing source: {source['url']}")
+                content = await self.scraper.scrape_url(source["url"])
+                if not content["error"] and content["content"]:
+                    source_contents.append(content)
+                    logging.info(f"SUCCESS: Successfully scraped content ({len(content['content'])} chars)")
+                else:
+                    logging.warning(f"WARNING: Failed to scrape content: {content.get('error', 'Unknown error')}")
+            
+            if not source_contents:
+                logging.error("ERROR: No content could be scraped from any source")
+                return {"error": "No content could be scraped from any source"}
+            
+            # Log content stats
+            logging.info("\nContent Statistics:")
+            for idx, source in enumerate(source_contents, 1):
+                logging.info(f"Source {idx}: {len(source['content'])} chars from {source['domain']}")
+            
             # Generate content
             logging.info("\nGenerating content using Claude...")
             content_data = self.content_generator.generate_content(source_contents, article_data["title"])
